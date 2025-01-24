@@ -1,5 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:intl_phone_field/intl_phone_field.dart';
+import 'package:youbloomdemo/bloc/login_bloc/login_bloc.dart';
+import 'package:youbloomdemo/bloc/login_bloc/login_event.dart';
+import 'package:youbloomdemo/bloc/login_bloc/login_state.dart';
 import 'package:youbloomdemo/config/images/images.dart';
 import 'package:youbloomdemo/config/text_style/text_style.dart';
 import '../../config/color/color.dart';
@@ -15,19 +19,11 @@ class _LoginScreenState extends State<LoginScreen> {
   final _formKey = GlobalKey<FormState>();
   final _phoneController = TextEditingController();
   final _emailController = TextEditingController();
+  final _passwordController = TextEditingController();
   bool isPhone = true;
   String? phoneNumber;
   bool isLoading = false;
 
-  String? validatePhone(String? value) {
-    if (value == null || value.isEmpty) {
-      return 'Please enter phone number';
-    }
-    if (phoneNumber == null || phoneNumber!.length < 8) {
-      return 'Please enter valid phone number';
-    }
-    return null;
-  }
 
   Future<void> handleLogin() async {
     if (!_formKey.currentState!.validate()) return;
@@ -79,10 +75,7 @@ class _LoginScreenState extends State<LoginScreen> {
                     children: [
                       Image.asset(loginImg),
                       const SizedBox(height: 20),
-                      Text(
-                        'Welcome Back',
-                        style: xLargeBoldText
-                      ),
+                      Text('Welcome Back', style: xLargeBoldText),
                     ],
                   ),
                 ),
@@ -106,134 +99,146 @@ class _LoginScreenState extends State<LoginScreen> {
                     child: Column(
                       children: [
                         // Toggle Buttons
-                        Container(
-                          decoration: BoxDecoration(
-                            color: AppColor.grey.withValues(alpha: 0.2),
-                            borderRadius: BorderRadius.circular(10),
-                          ),
-                          padding: const EdgeInsets.all(5),
-                          child: Row(
-                            children: [
-                              Expanded(
-                                child: InkWell(
-                                  onTap: () => setState(() => isPhone = true),
-                                  child: Container(
-                                    padding: const EdgeInsets.symmetric(
-                                        vertical: 12),
-                                    decoration: BoxDecoration(
-                                      color: isPhone
-                                          ? AppColor.primaryColor
-                                          : Colors.transparent,
-                                      borderRadius: BorderRadius.circular(8),
-                                      boxShadow: isPhone
-                                          ? [
-                                              BoxShadow(
-                                                color: Colors.grey
-                                                    .withOpacity(0.1),
-                                                spreadRadius: 1,
-                                                blurRadius: 3,
-                                              ),
-                                            ]
-                                          : null,
-                                    ),
-                                    child: Text(
-                                      'Phone',
-                                      textAlign: TextAlign.center,
-                                      style: TextStyle(
-                                        color: isPhone
-                                            ? AppColor.whiteColor
-                                            : AppColor.grey,
-                                        fontWeight: FontWeight.bold,
+                        BlocBuilder<LoginBloc, LoginState>(
+                          builder: (context,state){
+                            return Container(
+                              decoration: BoxDecoration(
+                                color: AppColor.grey.withValues(alpha: 0.2),
+                                borderRadius: BorderRadius.circular(10),
+                              ),
+                              padding: const EdgeInsets.all(5),
+                              child: Row(
+                                children: [
+                                  Expanded(
+                                    child: InkWell(
+                                      onTap: () => context.read<LoginBloc>().add(LoginWithPhone()),
+                                      child: Container(
+                                        padding: const EdgeInsets.symmetric(
+                                            vertical: 12),
+                                        decoration: BoxDecoration(
+                                          color: state.isLoginWithPhone
+                                              ? AppColor.primaryColor
+                                              : Colors.transparent,
+                                          borderRadius: BorderRadius.circular(8),
+                                          boxShadow: state.isLoginWithPhone
+                                              ? [
+                                            BoxShadow(
+                                              color: Colors.grey
+                                                  .withOpacity(0.1),
+                                              spreadRadius: 1,
+                                              blurRadius: 3,
+                                            ),
+                                          ]
+                                              : null,
+                                        ),
+                                        child: Text(
+                                          'Phone',
+                                          textAlign: TextAlign.center,
+                                          style: TextStyle(
+                                            color: state.isLoginWithPhone
+                                                ? AppColor.whiteColor
+                                                : AppColor.grey,
+                                            fontWeight: FontWeight.bold,
+                                          ),
+                                        ),
                                       ),
                                     ),
                                   ),
-                                ),
-                              ),
-                              Expanded(
-                                child: GestureDetector(
-                                  onTap: () => setState(() => isPhone = false),
-                                  child: Container(
-                                    padding: const EdgeInsets.symmetric(
-                                        vertical: 12),
-                                    decoration: BoxDecoration(
-                                      color: !isPhone
-                                          ? AppColor.primaryColor
-                                          : Colors.transparent,
-                                      borderRadius: BorderRadius.circular(8),
-                                      boxShadow: !isPhone
-                                          ? [
-                                              BoxShadow(
-                                                color: Colors.grey
-                                                    .withOpacity(0.1),
-                                                spreadRadius: 1,
-                                                blurRadius: 3,
-                                              ),
-                                            ]
-                                          : null,
-                                    ),
-                                    child: Text(
-                                      'Email',
-                                      textAlign: TextAlign.center,
-                                      style: TextStyle(
-                                        color: !isPhone
-                                            ? AppColor.whiteColor
-                                            : AppColor.grey,
-                                        fontWeight: FontWeight.bold,
+                                  Expanded(
+                                    child: GestureDetector(
+                                      onTap: () => context.read<LoginBloc>().add(LoginWithEmail()),
+                                      child: Container(
+                                        padding: const EdgeInsets.symmetric(
+                                            vertical: 12),
+                                        decoration: BoxDecoration(
+                                          color: !state.isLoginWithPhone
+                                              ? AppColor.primaryColor
+                                              : Colors.transparent,
+                                          borderRadius: BorderRadius.circular(8),
+                                          boxShadow: !state.isLoginWithPhone?
+                                          [
+                                            BoxShadow(
+                                              color: Colors.grey
+                                                  .withOpacity(0.1),
+                                              spreadRadius: 1,
+                                              blurRadius: 3,
+                                            ),
+                                          ]
+                                              : null,
+                                        ),
+                                        child: Text(
+                                          'Email',
+                                          textAlign: TextAlign.center,
+                                          style: TextStyle(
+                                            color: !state.isLoginWithPhone
+                                                ? AppColor.whiteColor
+                                                : AppColor.grey,
+                                            fontWeight: FontWeight.bold,
+                                          ),
+                                        ),
                                       ),
                                     ),
                                   ),
-                                ),
+                                ],
                               ),
-                            ],
-                          ),
+                            );
+                          },
+
                         ),
                         const SizedBox(height: 30),
 
                         // Input Fields
-                        AnimatedSwitcher(
-                          duration: const Duration(milliseconds: 300),
-                          child: isPhone
-                              ? IntlPhoneField(
-                                  controller: _phoneController,
-                                  decoration: InputDecoration(
-                                    labelText: 'Phone Number',
-                                    labelStyle:
-                                        TextStyle(color: AppColor.blackColor),
-                                    border: OutlineInputBorder(
-                                      borderRadius: BorderRadius.circular(10),
-                                      borderSide: BorderSide(
-                                          color: AppColor.primaryColor.withValues(alpha: 0.4)),
-                                    ),
-                                    focusedBorder: OutlineInputBorder(
-                                      borderRadius: BorderRadius.circular(10),
-                                      borderSide: BorderSide(
-                                          color: AppColor.primaryColor.withValues(alpha: 0.4)),
-                                    ),
-                                    filled: true,
-                                    fillColor: Colors.grey.shade50,
-                                    errorStyle:
-                                        const TextStyle(color: Colors.red),
-                                  ),
-                                  initialCountryCode: 'IN',
-                                  validator: (phone) => validatePhone(phone.toString()),
-                                  onChanged: (phone) {
-                                    setState(() =>
-                                        phoneNumber = phone.completeNumber);
-                                  },
-                                  invalidNumberMessage: 'Invalid phone number',
-                                )
-                              : TextFormField(
+                        BlocBuilder<LoginBloc,LoginState>(
+                            builder: (context,state){
+                          return AnimatedSwitcher(
+                            duration: const Duration(milliseconds: 450),
+                            child: state.isLoginWithPhone
+                                ? IntlPhoneField(
+                              controller: _phoneController,
+                              decoration: InputDecoration(
+                                labelText: 'Phone Number',
+                                labelStyle:
+                                TextStyle(color: AppColor.blackColor),
+                                border: OutlineInputBorder(
+                                  borderRadius: BorderRadius.circular(10),
+                                  borderSide: BorderSide(
+                                      color: AppColor.primaryColor
+                                          .withValues(alpha: 0.4)),
+                                ),
+                                focusedBorder: OutlineInputBorder(
+                                  borderRadius: BorderRadius.circular(10),
+                                  borderSide: BorderSide(
+                                      color: AppColor.primaryColor
+                                          .withValues(alpha: 0.4)),
+                                ),
+                                filled: true,
+                                fillColor: Colors.grey.shade50,
+                                errorStyle:
+                                const TextStyle(color: Colors.red),
+                              ),
+                              initialCountryCode: 'IN',
+                              invalidNumberMessage: 'Invalid phone number',
+                              onChanged: (phone){
+                                  if(phone.isValidNumber()){
+
+                                  }
+                              },
+                            )
+                                : Column(
+                              children: [
+                                TextFormField(
                                   controller: _emailController,
                                   decoration: InputDecoration(
                                     labelText: 'Email',
                                     labelStyle:
-                                        TextStyle(color: AppColor.blackColor),
+                                    TextStyle(color: AppColor.blackColor),
                                     prefixIcon: Icon(Icons.email_outlined,
                                         color: AppColor.blackColor),
                                     border: OutlineInputBorder(
                                       borderRadius: BorderRadius.circular(10),
                                       borderSide: BorderSide(
-                                          color: AppColor.primaryColor.withValues(alpha: 0.4)),
+                                          color: AppColor.primaryColor
+                                              .withValues(alpha: 0.4)),
                                     ),
                                     filled: true,
                                     fillColor: Colors.grey.shade50,
@@ -243,14 +248,44 @@ class _LoginScreenState extends State<LoginScreen> {
                                       return 'Please enter email';
                                     }
                                     if (!RegExp(
-                                            r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$')
+                                        r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$')
                                         .hasMatch(value)) {
                                       return 'Please enter valid email';
                                     }
                                     return null;
                                   },
                                 ),
-                        ),
+                                SizedBox(height: 10,),
+                                TextFormField(
+                                  controller: _passwordController,
+                                  decoration: InputDecoration(
+                                    labelText: 'Password',
+                                    labelStyle:
+                                    TextStyle(color: AppColor.blackColor),
+                                    prefixIcon: Icon(Icons.lock_outline,
+                                        color: AppColor.blackColor),
+                                    suffixIcon: Icon(Icons.visibility_off,
+                                        color: AppColor.blackColor),
+                                    border: OutlineInputBorder(
+                                      borderRadius: BorderRadius.circular(10),
+                                      borderSide: BorderSide(
+                                          color: AppColor.primaryColor
+                                              .withValues(alpha: 0.4)),
+                                    ),
+                                    filled: true,
+                                    fillColor: Colors.grey.shade50,
+                                  ),
+                                  validator: (value) {
+                                   if(value == null || value.isEmpty){
+                                     return 'Please enter password';
+                                   }
+                                    return null;
+                                  },
+                                ),
+                              ],
+                            )
+                          );
+                        }),
                         const SizedBox(height: 30),
 
                         // Login Button
@@ -258,9 +293,9 @@ class _LoginScreenState extends State<LoginScreen> {
                           width: double.infinity,
                           height: 55,
                           child: ElevatedButton(
-                            onPressed: isLoading  ? null : handleLogin,
+                            onPressed: isLoading ? null : handleLogin,
                             style: ElevatedButton.styleFrom(
-                              backgroundColor:   AppColor.primaryColor,
+                              backgroundColor: AppColor.primaryColor,
                               shape: RoundedRectangleBorder(
                                 borderRadius: BorderRadius.circular(10),
                               ),
@@ -276,7 +311,7 @@ class _LoginScreenState extends State<LoginScreen> {
                                       strokeWidth: 2,
                                     ),
                                   )
-                                :  Text(
+                                : Text(
                                     'Login',
                                     style: TextStyle(
                                       fontSize: 18,
