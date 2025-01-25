@@ -16,3 +16,11 @@ class ScrollListenerEvent extends HomeEvent{
   @override
   List<Object> get props =>[];
 }
+
+class FilterProduct extends HomeEvent{
+  final String key;
+  const FilterProduct(this.key);
+
+  @override
+  List<Object> get props => [key];
+}

@@ -6,16 +6,17 @@ class HomeState extends Equatable {
   final LoadingStatus productStatus;
   final List<Products> productData;
   final String message;
-
   final int page;
   final bool isLoadingMore;
+  final List<Products> filteredData;
 
   const HomeState({
     this.productStatus = LoadingStatus.initial,
     this.productData = const [],
     this.message = '',
     this.page = 1,
-    this.isLoadingMore = false
+    this.isLoadingMore = false,
+    this.filteredData = const []
   });
 
   HomeState copyWith({
@@ -24,6 +25,7 @@ class HomeState extends Equatable {
     String? message,
     int? page,
     bool? isLoadingMore,
+    List<Products>? filteredData
   }) {
     return HomeState(
       productStatus: productStatus ?? this.productStatus,
@@ -31,10 +33,11 @@ class HomeState extends Equatable {
       message: message ?? this.message,
       page: page ?? this.page,
       isLoadingMore: isLoadingMore ?? this.isLoadingMore,
+      filteredData: filteredData ?? this.filteredData
     );
   }
 
   @override
   List<Object?> get props =>
-      [productStatus, productData, message,page,isLoadingMore];
+      [productStatus, productData, message,page,isLoadingMore, filteredData];
 }
