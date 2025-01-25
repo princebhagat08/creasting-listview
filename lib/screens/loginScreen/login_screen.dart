@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:intl_phone_field/intl_phone_field.dart';
 import 'package:youbloomdemo/bloc/login_bloc/login_bloc.dart';
 import 'package:youbloomdemo/bloc/login_bloc/login_event.dart';
@@ -218,6 +219,17 @@ class _LoginScreenState extends State<LoginScreen> {
                                           isValidPhoneNumber = false;
                                         }
                                       },
+                                      validator: (value) {
+                                        if (value == null ||
+                                            value.number.isEmpty) {
+                                          return 'Enter valid number';
+                                        }
+
+                                        if (!value.isValidNumber()) {
+                                          return 'Invalid number';
+                                        }
+                                        return null;
+                                      },
                                     )
                                   : Column(
                                       children: [
@@ -258,15 +270,17 @@ class _LoginScreenState extends State<LoginScreen> {
                                         ),
                                         TextFormField(
                                           controller: _passwordController,
+                                          obscureText: state.isHidePassword,
                                           decoration: InputDecoration(
                                             labelText: 'Password',
                                             labelStyle: TextStyle(
                                                 color: AppColor.blackColor),
                                             prefixIcon: Icon(Icons.lock_outline,
                                                 color: AppColor.blackColor),
-                                            suffixIcon: Icon(
-                                                Icons.visibility_off,
-                                                color: AppColor.blackColor),
+                                            suffixIcon: IconButton(icon:  Icon(
+                                              state.isHidePassword ? Icons.visibility_off:Icons.visibility,
+                                              color: AppColor.blackColor,),
+                                              onPressed: ()=>context.read<LoginBloc>().add(HidePassword()),),
                                             border: OutlineInputBorder(
                                               borderRadius:
                                                   BorderRadius.circular(10),
@@ -291,64 +305,86 @@ class _LoginScreenState extends State<LoginScreen> {
                         const SizedBox(height: 30),
 
                         // Login Button
-                        BlocBuilder<LoginBloc, LoginState>(
-                            builder: (context, state) {
-                          return SizedBox(
-                            width: double.infinity,
-                            height: 55,
-                            child: ElevatedButton(
-                              onPressed: () {
-                                state.isLoginWithPhone && isValidPhoneNumber
-                                    ? {
-                                        context
-                                            .read<LoginBloc>()
-                                            .add(SendPhoneOTP(completeNumber)),
+                       BlocListener<LoginBloc, LoginState>(
+                         listenWhen: (current, previous)=>current.loginStatus != previous.loginStatus,
+                           listener:(context,state){
+                              if(state.loginStatus == LoginStatus.error){
+                                showDialog(
+                                    context: context,
+                                    builder: (context) =>
+                                        CustomAlertDialog(
+                                          title: "Error",
+                                          content: Text(state.errorMessage ?? 'Something went wrong'),
+                                          actions: [
+                                            TextButton(
+                                                onPressed: () {
+                                                  Navigator.of(context)
+                                                      .pop();
+                                                },
+                                                child: Text('Ok')),
+                                          ],
+                                        ));
+                              }
+                              if(state.loginStatus == LoginStatus.success){
+                                if(state.isLoginWithPhone){
+                                  Navigator.pushNamed(
+                                      context, RoutesName.otp);
+                                }else{
+                                  Fluttertoast.showToast(msg: 'Login Successful');
+                                  Navigator.pushReplacementNamed(context, RoutesName.home);
+                                }
 
-                                        // Navigate to otp screen
-                                        state.isOtpSent
-                                            ? Navigator.pushNamed(
-                                                context, RoutesName.otp)
-                                            : showDialog(
-                                                context: context,
-                                                builder: (context) =>
-                                                    CustomAlertDialog(
-                                                      title: "Error",
-                                                      content: Text(
-                                                          state.errorMessage.toString()),
-                                                      actions: [
-                                                        TextButton(
-                                                            onPressed: () {Navigator.of(context).pop();},
-                                                            child: Text('Ok')),
-                                                      ],
-                                                    ))
-                                      }
-                                    : null;
-                              },
-                              style: ElevatedButton.styleFrom(
-                                backgroundColor:
-                                    state.isLoginWithPhone && isValidPhoneNumber
-                                        ? AppColor.primaryColor
-                                        : AppColor.grey,
-                                shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(10),
-                                ),
-                                elevation: 2,
-                              ),
-                              child: state.loginStatus == LoginStatus.loading
-                                  ? CustomLoader(
-                                      primaryColor: AppColor.whiteColor,
-                                    )
-                                  : Text(
-                                      'Login',
-                                      style: TextStyle(
-                                        fontSize: 18,
-                                        fontWeight: FontWeight.bold,
-                                        color: AppColor.whiteColor,
-                                      ),
-                                    ),
-                            ),
-                          );
-                        })
+                              }
+                           },
+                         child:  BlocBuilder<LoginBloc, LoginState>(
+                             builder: (context, state) {
+                               return SizedBox(
+                                 width: double.infinity,
+                                 height: 55,
+                                 child: ElevatedButton(
+                                   onPressed: () {
+                                     FocusScope.of(context).unfocus();
+                                     if (state.isLoginWithPhone) {
+                                       if (isValidPhoneNumber) {
+                                         context
+                                             .read<LoginBloc>()
+                                             .add(SendPhoneOTP(completeNumber));
+                                       } else {
+                                         Fluttertoast.showToast(
+                                             msg: 'Enter Valid phone number');
+                                       }
+                                     } else {
+                                       if (_formKey.currentState!.validate()) {
+                                         context.read<LoginBloc>().add(ValidateUser(
+                                             _emailController.text.trim(),
+                                             _passwordController.text.trim()));
+                                       }
+                                     }
+                                   },
+                                   style: ElevatedButton.styleFrom(
+                                     backgroundColor: AppColor.primaryColor,
+                                     shape: RoundedRectangleBorder(
+                                       borderRadius: BorderRadius.circular(10),
+                                     ),
+                                     elevation: 2,
+                                   ),
+                                   child: state.loginStatus == LoginStatus.loading
+                                       ? CustomLoader(
+                                     primaryColor: AppColor.whiteColor,
+                                   )
+                                       : Text(
+                                     'Login',
+                                     style: TextStyle(
+                                       fontSize: 18,
+                                       fontWeight: FontWeight.bold,
+                                       color: AppColor.whiteColor,
+                                     ),
+                                   ),
+                                 ),
+                               );
+                             }),
+
+                       ),
                       ],
                     ),
                   ),

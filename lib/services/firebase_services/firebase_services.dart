@@ -6,8 +6,7 @@ class FirebaseServices {
   final FirebaseAuth auth = FirebaseAuth.instance;
   String? verificationId;
 
-  Future<bool> sendOtp(String phoneNumber) async {
-    bool isSent = false;
+  Future<bool?> sendOtp(String phoneNumber) async {
     try {
       await auth.verifyPhoneNumber(
         phoneNumber: phoneNumber,
@@ -18,31 +17,33 @@ class FirebaseServices {
 
         },
         codeSent: (String verificationId, int? resendToken) {
-          isSent = true;
           this.verificationId = verificationId;
         },
         codeAutoRetrievalTimeout: (String verificationId) {
           this.verificationId = verificationId;
         },
       );
+    } on FirebaseException {
+      throw Exception('');
     } catch (e) {
       throw Exception(e);
     }
-    return isSent;
   }
 
-  Future<bool> verifyOtp(String verificationId, String otp) async {
-    bool isVerified = false;
-    try {
-      PhoneAuthCredential credential = await PhoneAuthProvider.credential(
-          verificationId: verificationId, smsCode: otp);
-      auth.signInWithCredential(credential).then((value) {
-        isVerified = true;
-      });
-      return isVerified;
-    } catch (e) {
-      print(e);
-      return isVerified;
+    Future<bool> verifyOtp(String verificationId, String otp) async {
+      bool isVerified = false;
+      try {
+        PhoneAuthCredential credential = await PhoneAuthProvider.credential(
+            verificationId: verificationId, smsCode: otp);
+        auth.signInWithCredential(credential).then((value) {
+          isVerified = true;
+        });
+        return isVerified;
+      } catch (e) {
+        print(e);
+        return isVerified;
+      }
     }
   }
-}
+
+

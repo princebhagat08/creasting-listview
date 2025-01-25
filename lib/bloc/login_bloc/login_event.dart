@@ -9,8 +9,6 @@ abstract class LoginEvent extends Equatable {
 
 class LoginWithPhone extends LoginEvent {}
 
-class LoginWithEmail extends LoginEvent {}
-
 class SendPhoneOTP extends LoginEvent {
   final String phoneNumber;
   const SendPhoneOTP(this.phoneNumber,);
@@ -26,4 +24,14 @@ class ValidateOTP extends LoginEvent{
   List<Object?> get props => [verificationId,otp];
 }
 
-class ValidateEmail extends LoginEvent {}
+class LoginWithEmail extends LoginEvent {}
+
+class ValidateUser extends LoginEvent {
+  final String email;
+  final String password;
+  const ValidateUser(this.email,this.password);
+  @override
+  List<Object> get props => [email,password];
+}
+
+class HidePassword extends LoginEvent{}

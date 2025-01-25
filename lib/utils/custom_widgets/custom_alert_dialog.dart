@@ -40,7 +40,7 @@ class CustomAlertDialog extends StatelessWidget {
       contentPadding: contentPadding ?? const EdgeInsets.all(16.0),
       title: title != null
           ? Text(title!,
-              style: titleStyle ?? xLargeBoldText, textAlign: TextAlign.center)
+              style: titleStyle ?? largeBoldText, textAlign: TextAlign.center)
           : null,
       content: content ??
           (message != null

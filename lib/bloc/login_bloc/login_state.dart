@@ -7,29 +7,36 @@ class LoginState extends Equatable {
   final LoginStatus loginStatus;
   final bool isVerified;
   final String? errorMessage;
+  final bool isHidePassword;
 
   const LoginState(
       {this.isLoginWithPhone = true,
       this.isOtpSent = false,
       this.loginStatus = LoginStatus.initial,
       this.isVerified = false,
-      this.errorMessage = ''});
+      this.errorMessage,
+      this.isHidePassword = true,
+      });
 
   LoginState copyWith(
       {bool? isLoginWithPhone,
       bool? isOtpSent,
       LoginStatus? loginStatus,
       bool? isVerified,
-      String? errorMessage}) {
+      String? errorMessage,
+      bool? isHidePassword,
+      }) {
     return LoginState(
         isLoginWithPhone: isLoginWithPhone ?? this.isLoginWithPhone,
         isOtpSent: isOtpSent ?? this.isOtpSent,
         loginStatus: loginStatus ?? this.loginStatus,
         isVerified: isVerified ?? this.isVerified,
-        errorMessage: errorMessage ?? this.errorMessage);
+        errorMessage: errorMessage ?? this.errorMessage,
+        isHidePassword: isHidePassword ?? this.isHidePassword
+    );
   }
 
   @override
   List<Object?> get props =>
-      [isLoginWithPhone, isOtpSent, loginStatus, isVerified, errorMessage];
+      [isLoginWithPhone, isOtpSent, loginStatus, isVerified, errorMessage, isHidePassword];
 }
