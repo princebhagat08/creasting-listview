@@ -4,28 +4,37 @@ import 'package:youbloomdemo/utils/enums.dart';
 
 class HomeState extends Equatable {
   final LoadingStatus productStatus;
-  final ProductModel? productData;
+  final List<Products> productData;
   final String message;
+
+  final int page;
+  final bool isLoadingMore;
 
   const HomeState({
     this.productStatus = LoadingStatus.initial,
-    this.productData,
+    this.productData = const [],
     this.message = '',
+    this.page = 1,
+    this.isLoadingMore = false
   });
 
   HomeState copyWith({
     LoadingStatus? productStatus,
-    ProductModel? productData,
+    List<Products>? productData,
     String? message,
+    int? page,
+    bool? isLoadingMore,
   }) {
     return HomeState(
       productStatus: productStatus ?? this.productStatus,
       productData: productData ?? this.productData,
       message: message ?? this.message,
+      page: page ?? this.page,
+      isLoadingMore: isLoadingMore ?? this.isLoadingMore,
     );
   }
 
   @override
   List<Object?> get props =>
-      [productStatus, productData, message];
+      [productStatus, productData, message,page,isLoadingMore];
 }

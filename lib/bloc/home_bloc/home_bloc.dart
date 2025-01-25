@@ -9,19 +9,38 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
 
   HomeBloc() : super(const HomeState()) {
     on<FetchProduct>(_fetchProducts);
+    on<ScrollListenerEvent>(_scrollListener);
   }
 
   void _fetchProducts(FetchProduct event, Emitter<HomeState> emit) async {
     emit(state.copyWith(productStatus: LoadingStatus.loading));
 
     try {
-      final productData = await homeRepository.getProduct();
-      print(productData.products!.first.title);
+      final productData = await homeRepository.getProduct(7, state.page);
+      final productList = productData.products ?? [];
+      final updatedProduct = [...state.productData, ...productList];
       emit(state.copyWith(
-          productStatus: LoadingStatus.success, productData: productData));
+          productStatus: LoadingStatus.success, productData: updatedProduct,isLoadingMore: false));
     } catch (e) {
       emit(state.copyWith(
           productStatus: LoadingStatus.error, message: e.toString()));
     }
   }
+
+  void _scrollListener(ScrollListenerEvent event, Emitter<HomeState> emit) {
+    final controller = event.controller;
+
+    if (controller.position.pixels == controller.position.maxScrollExtent) {
+      if(!state.isLoadingMore){
+        final int newPage = state.page + 1;
+        emit(state.copyWith(page: newPage, isLoadingMore: true));
+        print('page Number : ${state.page}');
+        add(FetchProduct());
+      }
+    } else {
+      print("thoda aur");
+    }
+
+  }
+
 }
