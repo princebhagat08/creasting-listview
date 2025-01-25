@@ -5,6 +5,7 @@ import 'package:youbloomdemo/bloc/login_bloc/login_event.dart';
 import 'package:youbloomdemo/bloc/login_bloc/login_state.dart';
 import 'package:youbloomdemo/repository/login_repo/login_repository.dart';
 import 'package:youbloomdemo/services/firebase_services/firebase_services.dart';
+import 'package:youbloomdemo/services/session_manager/session_controller.dart';
 import 'package:youbloomdemo/utils/enums.dart';
 
 class LoginBloc extends Bloc<LoginEvent, LoginState> {
@@ -77,8 +78,10 @@ class LoginBloc extends Bloc<LoginEvent, LoginState> {
     };
 
 
-    await loginRepository.loginApi(data).then((response){
+    await loginRepository.loginApi(data).then((response) async {
       if(response.message == null || response.message!.isEmpty){
+        await SessionController().saveUserInPreference(response);
+        await SessionController().getUserFromPreference();
         emit(state.copyWith(loginStatus: LoginStatus.success));
       }else{
         emit(state.copyWith(loginStatus: LoginStatus.error, errorMessage: '${response.message}\nPlease check your credentials'));

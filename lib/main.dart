@@ -5,6 +5,7 @@ import 'package:youbloomdemo/bloc/login_bloc/login_bloc.dart';
 import 'package:youbloomdemo/config/routes/routes.dart';
 import 'package:youbloomdemo/config/routes/routes_name.dart';
 import 'package:youbloomdemo/services/firebase_services/firebase_options.dart';
+import 'package:youbloomdemo/services/session_manager/check_session.dart';
 
 import 'config/color/color.dart';
 
@@ -32,7 +33,7 @@ class MyApp extends StatelessWidget {
           useMaterial3: true,
           scaffoldBackgroundColor: AppColor.offWhite,
         ),
-        initialRoute: RoutesName.login, // Initial route
+        initialRoute: RoutesName.home, // Initial route
         onGenerateRoute: Routes.generateRoute,
       ),
     );
