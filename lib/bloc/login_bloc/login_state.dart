@@ -4,7 +4,7 @@ import 'package:youbloomdemo/utils/enums.dart';
 class LoginState extends Equatable {
   final bool isLoginWithPhone;
   final bool isOtpSent;
-  final LoginStatus loginStatus;
+  final LoadingStatus loginStatus;
   final bool isVerified;
   final String? errorMessage;
   final bool isHidePassword;
@@ -12,7 +12,7 @@ class LoginState extends Equatable {
   const LoginState(
       {this.isLoginWithPhone = true,
       this.isOtpSent = false,
-      this.loginStatus = LoginStatus.initial,
+      this.loginStatus = LoadingStatus.initial,
       this.isVerified = false,
       this.errorMessage,
       this.isHidePassword = true,
@@ -21,7 +21,7 @@ class LoginState extends Equatable {
   LoginState copyWith(
       {bool? isLoginWithPhone,
       bool? isOtpSent,
-      LoginStatus? loginStatus,
+      LoadingStatus? loginStatus,
       bool? isVerified,
       String? errorMessage,
       bool? isHidePassword,

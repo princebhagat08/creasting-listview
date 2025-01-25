@@ -1,5 +1,3 @@
-import 'dart:math';
-
 import 'package:bloc/bloc.dart';
 import 'package:youbloomdemo/bloc/login_bloc/login_event.dart';
 import 'package:youbloomdemo/bloc/login_bloc/login_state.dart';
@@ -30,7 +28,7 @@ class LoginBloc extends Bloc<LoginEvent, LoginState> {
   }
 
   void _sentOTP(SendPhoneOTP event, Emitter<LoginState> emit) async {
-    emit(state.copyWith(loginStatus: LoginStatus.loading));
+    emit(state.copyWith(loginStatus: LoadingStatus.loading));
     final number = event.phoneNumber;
 
     try {
@@ -41,18 +39,18 @@ class LoginBloc extends Bloc<LoginEvent, LoginState> {
       if (isSent != null && isSent) {
         emit(state.copyWith(
           isOtpSent: isSent,
-          loginStatus: LoginStatus.success,
+          loginStatus: LoadingStatus.success,
         ));
       }else{
         emit(state.copyWith(
-          loginStatus: LoginStatus.error,
+          loginStatus: LoadingStatus.error,
           errorMessage:'OTP not sent',
         ));
       }
     } catch (error) {
 
       emit(state.copyWith(
-        loginStatus: LoginStatus.error,
+        loginStatus: LoadingStatus.error,
         errorMessage: error.toString(),
       ));
     }
@@ -65,12 +63,12 @@ class LoginBloc extends Bloc<LoginEvent, LoginState> {
         await firebaseServices.verifyOtp(verificationId, otp);
     emit(state.copyWith(
         isVerified: isVerified,
-        loginStatus: isVerified ? LoginStatus.success : LoginStatus.error));
+        loginStatus: isVerified ? LoadingStatus.success : LoadingStatus.error));
   }
 
   void _validateUser(ValidateUser event, Emitter<LoginState> emit) async {
 
-    emit(state.copyWith(loginStatus: LoginStatus.loading));
+    emit(state.copyWith(loginStatus: LoadingStatus.loading));
 
     Map data ={
       "email": event.email,
@@ -82,12 +80,12 @@ class LoginBloc extends Bloc<LoginEvent, LoginState> {
       if(response.message == null || response.message!.isEmpty){
         await SessionController().saveUserInPreference(response);
         await SessionController().getUserFromPreference();
-        emit(state.copyWith(loginStatus: LoginStatus.success));
+        emit(state.copyWith(loginStatus: LoadingStatus.success));
       }else{
-        emit(state.copyWith(loginStatus: LoginStatus.error, errorMessage: '${response.message}\nPlease check your credentials'));
+        emit(state.copyWith(loginStatus: LoadingStatus.error, errorMessage: '${response.message}\nPlease check your credentials'));
       }
     }).onError((error,stackTree){
-      emit(state.copyWith(errorMessage: error.toString(),loginStatus: LoginStatus.error));
+      emit(state.copyWith(errorMessage: error.toString(),loginStatus: LoadingStatus.error));
     });
 
   }

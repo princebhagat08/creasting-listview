@@ -1,6 +1,7 @@
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:youbloomdemo/bloc/home_bloc/home_bloc.dart';
 import 'package:youbloomdemo/bloc/login_bloc/login_bloc.dart';
 import 'package:youbloomdemo/config/routes/routes.dart';
 import 'package:youbloomdemo/config/routes/routes_name.dart';
@@ -9,7 +10,7 @@ import 'package:youbloomdemo/services/session_manager/check_session.dart';
 
 import 'config/color/color.dart';
 
-void main() async{
+void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
@@ -20,11 +21,13 @@ void main() async{
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
 
-
   @override
   Widget build(BuildContext context) {
-    return BlocProvider(
-      create: (_)=>LoginBloc(),
+    return MultiBlocProvider(
+      providers: [
+        BlocProvider(create: (_) => LoginBloc()),
+        BlocProvider(create: (_) => HomeBloc()),
+      ],
       child: MaterialApp(
         title: 'Youbloom Demo',
         debugShowCheckedModeBanner: false,
@@ -39,5 +42,3 @@ class MyApp extends StatelessWidget {
     );
   }
 }
-
-

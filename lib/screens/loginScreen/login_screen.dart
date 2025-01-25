@@ -308,7 +308,7 @@ class _LoginScreenState extends State<LoginScreen> {
                        BlocListener<LoginBloc, LoginState>(
                          listenWhen: (current, previous)=>current.loginStatus != previous.loginStatus,
                            listener:(context,state){
-                              if(state.loginStatus == LoginStatus.error){
+                              if(state.loginStatus == LoadingStatus.error){
                                 showDialog(
                                     context: context,
                                     builder: (context) =>
@@ -325,7 +325,7 @@ class _LoginScreenState extends State<LoginScreen> {
                                           ],
                                         ));
                               }
-                              if(state.loginStatus == LoginStatus.success){
+                              if(state.loginStatus == LoadingStatus.success){
                                 if(state.isLoginWithPhone){
                                   Navigator.pushNamed(
                                       context, RoutesName.otp);
@@ -368,7 +368,7 @@ class _LoginScreenState extends State<LoginScreen> {
                                      ),
                                      elevation: 2,
                                    ),
-                                   child: state.loginStatus == LoginStatus.loading
+                                   child: state.loginStatus == LoadingStatus.loading
                                        ? CustomLoader(
                                      primaryColor: AppColor.whiteColor,
                                    )
