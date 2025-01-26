@@ -1,13 +1,13 @@
-
 class RoutesName {
+  // login screen routes name
+  static const String login = 'login_screen';
 
-  static const String login = 'login_screen' ;
-
-  //accounts routes name
-  static const String otp = 'otp_screen' ;
+  // otp screen routes name
+  static const String otp = 'otp_screen';
 
   //home screen routes name
-  static const String home = 'home_screen' ;
+  static const String home = 'home_screen';
 
-
+  //description screen routes name
+  static const String productDescription = 'description_screen';
 }

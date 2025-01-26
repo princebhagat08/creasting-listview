@@ -30,11 +30,11 @@ class FirebaseServices {
     }
   }
 
-    Future<bool> verifyOtp(String verificationId, String otp) async {
+    Future<bool> verifyOtp(String otp) async {
       bool isVerified = false;
       try {
         PhoneAuthCredential credential = await PhoneAuthProvider.credential(
-            verificationId: verificationId, smsCode: otp);
+            verificationId: verificationId ?? '', smsCode: otp);
         auth.signInWithCredential(credential).then((value) {
           isVerified = true;
         });

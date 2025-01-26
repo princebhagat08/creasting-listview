@@ -12,7 +12,8 @@ class AppColor {
   static const Color lightBlack = Color(0xFF37474F); // Light Black
   static const Color bgColor = Color(0xFFF4F6F8); // Background
   static const Color lightPurple = Color(0xFFD9BDE9); // Soft Purple
-  static final Color lightGrey = Colors.grey.shade200; // Light Grey
+  static final Color lightGrey = Colors.grey.shade200;
+  static final Color deepGreen = Color(0xff208b3a);// Light Grey
 
   static const Color grey = Colors.grey; // Standard Grey
   static const Color darkGrey = Color(0xFF546E7A); // Dark Grey

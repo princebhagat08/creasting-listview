@@ -9,8 +9,7 @@ import 'package:youbloomdemo/config/routes/routes_name.dart';
 import 'package:youbloomdemo/config/text_style/text_style.dart';
 
 class OtpScreen extends StatelessWidget {
-  final String verificationId;
-  const OtpScreen({super.key, required this.verificationId});
+  const OtpScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -114,7 +113,7 @@ class OtpScreen extends StatelessWidget {
                       if (getOtp().length == 6) {
                         context
                             .read<LoginBloc>()
-                            .add(ValidateOTP(verificationId, getOtp()));
+                            .add(ValidateOTP( getOtp()));
                         state.isVerified
                             ? Navigator.pushReplacementNamed(
                                 context, RoutesName.home)

@@ -17,11 +17,10 @@ class SendPhoneOTP extends LoginEvent {
 }
 
 class ValidateOTP extends LoginEvent{
-  final String verificationId;
   final String otp;
-  const ValidateOTP(this.verificationId,this.otp);
+  const ValidateOTP(this.otp);
   @override
-  List<Object?> get props => [verificationId,otp];
+  List<Object?> get props => [otp];
 }
 
 class LoginWithEmail extends LoginEvent {}

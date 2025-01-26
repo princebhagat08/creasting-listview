@@ -4,11 +4,13 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:youbloomdemo/bloc/home_bloc/home_bloc.dart';
 import 'package:youbloomdemo/bloc/home_bloc/home_event.dart';
 import 'package:youbloomdemo/bloc/home_bloc/home_state.dart';
-import 'package:youbloomdemo/config/color/color.dart';
+import 'package:youbloomdemo/config/routes/routes_name.dart';
 import 'package:youbloomdemo/config/text_style/text_style.dart';
+import 'package:youbloomdemo/screens/description_screen/description_screen.dart';
 import 'package:youbloomdemo/utils/custom_widgets/custom_loader.dart';
 import 'package:youbloomdemo/utils/enums.dart';
 import 'package:shimmer/shimmer.dart';
+import 'package:youbloomdemo/config/routes/custom_page_route.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -19,7 +21,8 @@ class HomeScreen extends StatefulWidget {
 
 class _HomeScreenState extends State<HomeScreen> {
   final controller = ScrollController();
-  final FocusNode _focusNode = FocusNode();
+  final TextEditingController searchController = TextEditingController();
+  final FocusNode searchFocusNode = FocusNode();
 
   @override
   void initState() {
@@ -27,6 +30,19 @@ class _HomeScreenState extends State<HomeScreen> {
     context.read<HomeBloc>().add(FetchProduct());
     controller.addListener(
         () => context.read<HomeBloc>().add(ScrollListenerEvent(controller)));
+  }
+
+  @override
+  void dispose() {
+    searchController.dispose();
+    searchFocusNode.dispose();
+    super.dispose();
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    FocusScope.of(context).requestFocus(FocusNode());
   }
 
   Widget _buildShimmerEffect() {
@@ -57,7 +73,7 @@ class _HomeScreenState extends State<HomeScreen> {
       body: SafeArea(
         child: GestureDetector(
           onTap: (){
-            FocusScope.of(context).requestFocus(FocusNode());
+            FocusScope.of(context).unfocus();
           },
           child: Padding(
             padding: const EdgeInsets.all(16.0),
@@ -70,7 +86,8 @@ class _HomeScreenState extends State<HomeScreen> {
                 ),
                 const SizedBox(height: 16),
                 TextField(
-                  focusNode: _focusNode,
+                  controller: searchController,
+                  focusNode: searchFocusNode,
                   decoration: InputDecoration(
                     hintText: 'Search products...',
                     prefixIcon: const Icon(Icons.search),
@@ -103,148 +120,192 @@ class _HomeScreenState extends State<HomeScreen> {
 
                       if (state.productStatus == LoadingStatus.success ||
                           state.isLoadingMore) {
-
-                        return state.message.isNotEmpty ?
-                        Center(child: Text(state.message),):
-                          ListView.builder(
-                          controller: controller,
-                          itemCount: state.filteredData.isNotEmpty
-                              ? state.filteredData.length
-                              : state.productData.length,
-                          itemBuilder: (context, index) {
-                            final product = state.filteredData.isNotEmpty
-                                ? state.filteredData[index]
-                                : state.productData[index];
-                            return Padding(
-                              padding: const EdgeInsets.only(bottom: 16.0),
-                              child: (state.filteredData.isNotEmpty ||
-                                      index < state.productData.length - 1)
-                                  ? Container(
-                                      height: 250,
-                                      decoration: BoxDecoration(
-                                        color: Colors.grey[200],
-                                        borderRadius: BorderRadius.circular(16),
-                                      ),
-                                      child: Stack(
-                                        children: [
-                                          ClipRRect(
-                                            borderRadius:
-                                                BorderRadius.circular(16),
-                                            child: CachedNetworkImage(
-                                              imageUrl: product.thumbnail!,
-                                              width: double.infinity,
-                                              height: double.infinity,
-                                              fit: BoxFit.contain,
-                                            ),
-                                          ),
-                                          Container(
-                                            decoration: BoxDecoration(
-                                              borderRadius:
-                                                  BorderRadius.circular(16),
-                                              gradient: LinearGradient(
-                                                begin: Alignment.topCenter,
-                                                end: Alignment.bottomCenter,
-                                                colors: [
-                                                  Colors.transparent,
-                                                  Colors.black.withOpacity(0.7),
-                                                ],
+                        return state.message.isNotEmpty
+                            ? Center(
+                                child: Text(state.message),
+                              )
+                            : ListView.builder(
+                                controller: controller,
+                                itemCount: state.filteredData.isNotEmpty
+                                    ? state.filteredData.length
+                                    : state.productData.length,
+                                itemBuilder: (context, index) {
+                                  final product = state.filteredData.isNotEmpty
+                                      ? state.filteredData[index]
+                                      : state.productData[index];
+                                  return Padding(
+                                    padding:
+                                        const EdgeInsets.only(bottom: 16.0),
+                                    child: (state.filteredData.isNotEmpty ||
+                                            index <
+                                                state.productData.length - 1)
+                                        ? InkWell(
+                                            onTap: () { Navigator.of(context)
+                                                .pushNamed(
+                                                    RoutesName
+                                                        .productDescription,
+                                                    arguments: product);
+                                              },
+                                            child: Container(
+                                              height: 250,
+                                              decoration: BoxDecoration(
+                                                color: Colors.grey[200],
+                                                borderRadius:
+                                                    BorderRadius.circular(16),
                                               ),
-                                            ),
-                                          ),
-                                          Padding(
-                                            padding: const EdgeInsets.all(16.0),
-                                            child: Column(
-                                              crossAxisAlignment:
-                                                  CrossAxisAlignment.start,
-                                              mainAxisAlignment:
-                                                  MainAxisAlignment.spaceBetween,
-                                              children: [
-                                                Row(
-                                                  mainAxisAlignment:
-                                                      MainAxisAlignment
-                                                          .spaceBetween,
-                                                  children: [
-                                                    Container(
-                                                      padding: const EdgeInsets
-                                                          .symmetric(
-                                                        horizontal: 8,
-                                                        vertical: 4,
-                                                      ),
-                                                      decoration: BoxDecoration(
-                                                        color: Colors.grey[300],
-                                                        borderRadius:
-                                                            BorderRadius.circular(
-                                                                12),
-                                                      ),
-                                                      child: Text(
-                                                          '${product.stock} items'),
-                                                    ),
-                                                    Container(
-                                                      padding:
-                                                          const EdgeInsets.all(8),
-                                                      decoration:
-                                                          const BoxDecoration(
-                                                        color: Colors.white,
-                                                        shape: BoxShape.circle,
-                                                      ),
-                                                      child: const Icon(
-                                                          Icons.favorite_border),
-                                                    ),
-                                                  ],
-                                                ),
-                                                Column(
-                                                  crossAxisAlignment:
-                                                      CrossAxisAlignment.start,
-                                                  children: [
-                                                    Text(
-                                                      product.title!,
-                                                      style: const TextStyle(
-                                                        color: Colors.white,
-                                                        fontSize: 18,
-                                                        fontWeight:
-                                                            FontWeight.bold,
+                                              child: Stack(
+                                                children: [
+                                                  ClipRRect(
+                                                    borderRadius:
+                                                        BorderRadius.circular(
+                                                            16),
+                                                    child: Hero(
+                                                      tag: product.id!,
+                                                      child: CachedNetworkImage(
+                                                        imageUrl:
+                                                            product.thumbnail!,
+                                                        width: double.infinity,
+                                                        height: double.infinity,
+                                                        fit: BoxFit.contain,
                                                       ),
                                                     ),
-                                                    const SizedBox(height: 4),
-                                                    Row(
+                                                  ),
+                                                  Container(
+                                                    decoration: BoxDecoration(
+                                                      borderRadius:
+                                                          BorderRadius.circular(
+                                                              16),
+                                                      gradient: LinearGradient(
+                                                        begin:
+                                                            Alignment.topCenter,
+                                                        end: Alignment
+                                                            .bottomCenter,
+                                                        colors: [
+                                                          Colors.transparent,
+                                                          Colors.black
+                                                              .withOpacity(0.7),
+                                                        ],
+                                                      ),
+                                                    ),
+                                                  ),
+                                                  Padding(
+                                                    padding:
+                                                        const EdgeInsets.all(
+                                                            16.0),
+                                                    child: Column(
+                                                      crossAxisAlignment:
+                                                          CrossAxisAlignment
+                                                              .start,
                                                       mainAxisAlignment:
                                                           MainAxisAlignment
                                                               .spaceBetween,
                                                       children: [
-                                                        Text(
-                                                          '\$${product.price}',
-                                                          style: const TextStyle(
-                                                            color: Colors.white,
-                                                            fontSize: 16,
-                                                          ),
+                                                        Row(
+                                                          mainAxisAlignment:
+                                                              MainAxisAlignment
+                                                                  .spaceBetween,
+                                                          children: [
+                                                            Container(
+                                                              padding:
+                                                                  const EdgeInsets
+                                                                      .symmetric(
+                                                                horizontal: 8,
+                                                                vertical: 4,
+                                                              ),
+                                                              decoration:
+                                                                  BoxDecoration(
+                                                                color: Colors
+                                                                    .grey[300],
+                                                                borderRadius:
+                                                                    BorderRadius
+                                                                        .circular(
+                                                                            12),
+                                                              ),
+                                                              child: Text(
+                                                                  '${product.stock} items'),
+                                                            ),
+                                                            Container(
+                                                              padding:
+                                                                  const EdgeInsets
+                                                                      .all(8),
+                                                              decoration:
+                                                                  const BoxDecoration(
+                                                                color: Colors
+                                                                    .white,
+                                                                shape: BoxShape
+                                                                    .circle,
+                                                              ),
+                                                              child: const Icon(
+                                                                  Icons
+                                                                      .favorite_border),
+                                                            ),
+                                                          ],
                                                         ),
-                                                        Container(
-                                                          padding:
-                                                              const EdgeInsets
-                                                                  .all(8),
-                                                          decoration:
-                                                              const BoxDecoration(
-                                                            color: Colors.yellow,
-                                                            shape:
-                                                                BoxShape.circle,
-                                                          ),
-                                                          child: const Icon(Icons
-                                                              .shopping_bag_outlined),
+                                                        Column(
+                                                          crossAxisAlignment:
+                                                              CrossAxisAlignment
+                                                                  .start,
+                                                          children: [
+                                                            Text(
+                                                              product.title!,
+                                                              style:
+                                                                  const TextStyle(
+                                                                color: Colors
+                                                                    .white,
+                                                                fontSize: 18,
+                                                                fontWeight:
+                                                                    FontWeight
+                                                                        .bold,
+                                                              ),
+                                                            ),
+                                                            const SizedBox(
+                                                                height: 4),
+                                                            Row(
+                                                              mainAxisAlignment:
+                                                                  MainAxisAlignment
+                                                                      .spaceBetween,
+                                                              children: [
+                                                                Text(
+                                                                  '\$${product.price}',
+                                                                  style:
+                                                                      const TextStyle(
+                                                                    color: Colors
+                                                                        .white,
+                                                                    fontSize:
+                                                                        16,
+                                                                  ),
+                                                                ),
+                                                                Container(
+                                                                  padding:
+                                                                      const EdgeInsets
+                                                                          .all(
+                                                                          8),
+                                                                  decoration:
+                                                                      const BoxDecoration(
+                                                                    color: Colors
+                                                                        .yellow,
+                                                                    shape: BoxShape
+                                                                        .circle,
+                                                                  ),
+                                                                  child: const Icon(
+                                                                      Icons
+                                                                          .shopping_bag_outlined),
+                                                                ),
+                                                              ],
+                                                            ),
+                                                          ],
                                                         ),
                                                       ],
                                                     ),
-                                                  ],
-                                                ),
-                                              ],
+                                                  ),
+                                                ],
+                                              ),
                                             ),
-                                          ),
-                                        ],
-                                      ),
-                                    )
-                                  : CustomLoader(),
-                            );
-                          },
-                        );
+                                          )
+                                        : CustomLoader(),
+                                  );
+                                },
+                              );
                       }
 
                       return const Center(child: Text('No products available'));

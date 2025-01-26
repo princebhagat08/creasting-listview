@@ -328,7 +328,7 @@ class _LoginScreenState extends State<LoginScreen> {
                               if(state.loginStatus == LoadingStatus.success){
                                 if(state.isLoginWithPhone){
                                   Navigator.pushNamed(
-                                      context, RoutesName.otp);
+                                      context, RoutesName.otp,);
                                 }else{
                                   Fluttertoast.showToast(msg: 'Login Successful');
                                   Navigator.pushReplacementNamed(context, RoutesName.home);

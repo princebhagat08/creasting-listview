@@ -1,4 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:youbloomdemo/config/routes/custom_page_route.dart';
+import 'package:youbloomdemo/model/product_model.dart';
+import 'package:youbloomdemo/screens/description_screen/description_screen.dart';
 import 'package:youbloomdemo/screens/homeScreen/home_screen.dart';
 import 'package:youbloomdemo/screens/loginScreen/login_screen.dart';
 import 'package:youbloomdemo/screens/loginScreen/otp_screen.dart';
@@ -12,14 +15,16 @@ class Routes {
             builder: (BuildContext context) => const LoginScreen());
 
       case RoutesName.otp:
-        final verificationId = settings.arguments as String;
         return MaterialPageRoute(
-            builder: (BuildContext context) => OtpScreen(
-                  verificationId: verificationId,
-                ));
+            builder: (BuildContext context) => OtpScreen());
 
       case RoutesName.home:
         return MaterialPageRoute(builder: (BuildContext context) => const HomeScreen());
+
+      case RoutesName.productDescription:
+        final product = settings.arguments as Products;
+        return CustomPageRoute(page: DescriptionScreen(product: product));
+        // return MaterialPageRoute(builder: (BuildContext context) =>  DescriptionScreen(product: product));
 
       default:
         return MaterialPageRoute(builder: (_) {

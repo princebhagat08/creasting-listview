@@ -57,10 +57,9 @@ class LoginBloc extends Bloc<LoginEvent, LoginState> {
   }
 
   void _validateOtp(ValidateOTP event, Emitter<LoginState> emit) async {
-    final verificationId = event.verificationId;
     final otp = event.otp;
     final bool isVerified =
-        await firebaseServices.verifyOtp(verificationId, otp);
+        await firebaseServices.verifyOtp( otp);
     emit(state.copyWith(
         isVerified: isVerified,
         loginStatus: isVerified ? LoadingStatus.success : LoadingStatus.error));
