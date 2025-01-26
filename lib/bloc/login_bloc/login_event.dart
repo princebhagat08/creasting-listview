@@ -34,3 +34,17 @@ class ValidateUser extends LoginEvent {
 }
 
 class HidePassword extends LoginEvent{}
+
+class SendMockOtp extends LoginEvent{
+  final String mockNumber;
+  const SendMockOtp(this.mockNumber);
+  @override
+  List<Object> get props => [];
+}
+
+class ValidateMockOtp extends LoginEvent{
+  final String otp;
+  const ValidateMockOtp(this.otp);
+  @override
+  List<Object> get props => [];
+}

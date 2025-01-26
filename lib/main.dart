@@ -38,7 +38,7 @@ class MyApp extends StatelessWidget {
           useMaterial3: true,
           scaffoldBackgroundColor: AppColor.offWhite,
         ),
-        initialRoute: RoutesName.home, // Initial route
+        initialRoute: RoutesName.login, // Initial route
         onGenerateRoute: Routes.generateRoute,
       ),
     );

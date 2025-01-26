@@ -267,17 +267,17 @@ class _LoginScreenState extends State<LoginScreen> {
                     isValidPhoneNumber = false;
                   }
                 },
-                validator: (value) {
-                  if (value == null ||
-                      value.number.isEmpty) {
-                    return 'Enter valid number';
-                  }
-
-                  if (!value.isValidNumber()) {
-                    return 'Invalid number';
-                  }
-                  return null;
-                },
+                // validator: (value) {
+                //   if (value == null ||
+                //       value.number.isEmpty) {
+                //     return 'Enter valid number';
+                //   }
+                //
+                //   if (!value.isValidNumber()) {
+                //     return 'Invalid number';
+                //   }
+                //   return null;
+                // },
               )
                   : Column(
                 children: [
@@ -376,7 +376,7 @@ class _LoginScreenState extends State<LoginScreen> {
         }
         if(state.loginStatus == LoadingStatus.success){
           if(state.isLoginWithPhone){
-            Navigator.pushNamed(
+            Navigator.pushReplacementNamed(
               context, RoutesName.otp,);
           }else{
             Fluttertoast.showToast(msg: 'Login Successful');
@@ -395,9 +395,15 @@ class _LoginScreenState extends State<LoginScreen> {
                   FocusScope.of(context).unfocus();
                   if (state.isLoginWithPhone) {
                     if (isValidPhoneNumber) {
-                      context
-                          .read<LoginBloc>()
-                          .add(SendPhoneOTP(completeNumber));
+                      // sending otp via firebase
+                      // context
+                      //     .read<LoginBloc>()
+                      //     .add(SendPhoneOTP(completeNumber));
+
+                    //   Sending mock otp
+                      context.read<LoginBloc>().add(SendMockOtp(completeNumber));
+
+
                     } else {
                       Fluttertoast.showToast(
                           msg: 'Enter Valid phone number');

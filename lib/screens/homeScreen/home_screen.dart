@@ -185,7 +185,7 @@ class _HomeScreenState extends State<HomeScreen> {
             .pushNamed(RoutesName.productDescription, arguments: product);
       },
       child: Container(
-        height: size.height*0.2,
+        height: size.height*0.25,
         decoration: BoxDecoration(
           color: Colors.grey[200],
           borderRadius: BorderRadius.circular(16),

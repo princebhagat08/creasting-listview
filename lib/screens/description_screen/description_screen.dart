@@ -245,7 +245,7 @@ Widget _backButton(Size size, BuildContext context){
                         Text(
                           'Add to Cart',
                           style: TextStyle(
-                            fontSize: 16,
+                            fontSize: 12,
                             fontFamily: fontFamily,
                             fontWeight: FontWeight.w600,
                           ),

@@ -8,6 +8,8 @@ class LoginState extends Equatable {
   final bool isVerified;
   final String? errorMessage;
   final bool isHidePassword;
+  final String mockNumber;
+  final String mockOtp;
 
   const LoginState(
       {this.isLoginWithPhone = true,
@@ -16,6 +18,8 @@ class LoginState extends Equatable {
       this.isVerified = false,
       this.errorMessage,
       this.isHidePassword = true,
+      this.mockNumber = '+919876543210',
+       this.mockOtp = '582852',
       });
 
   LoginState copyWith(
@@ -25,6 +29,8 @@ class LoginState extends Equatable {
       bool? isVerified,
       String? errorMessage,
       bool? isHidePassword,
+      String? mockNumber,
+        String? mockOtp
       }) {
     return LoginState(
         isLoginWithPhone: isLoginWithPhone ?? this.isLoginWithPhone,
@@ -32,11 +38,13 @@ class LoginState extends Equatable {
         loginStatus: loginStatus ?? this.loginStatus,
         isVerified: isVerified ?? this.isVerified,
         errorMessage: errorMessage ?? this.errorMessage,
-        isHidePassword: isHidePassword ?? this.isHidePassword
+        isHidePassword: isHidePassword ?? this.isHidePassword,
+        mockNumber: mockNumber ?? this.mockNumber,
+        mockOtp: mockOtp ?? this.mockOtp,
     );
   }
 
   @override
   List<Object?> get props =>
-      [isLoginWithPhone, isOtpSent, loginStatus, isVerified, errorMessage, isHidePassword];
+      [isLoginWithPhone, isOtpSent, loginStatus, isVerified, errorMessage, isHidePassword, mockNumber, mockOtp];
 }

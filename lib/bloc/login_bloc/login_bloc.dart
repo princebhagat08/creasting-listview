@@ -17,6 +17,8 @@ class LoginBloc extends Bloc<LoginEvent, LoginState> {
     on<ValidateOTP>(_validateOtp);
     on<ValidateUser>(_validateUser);
     on<HidePassword>(_showPassword);
+    on<SendMockOtp>(_sendMockOtp);
+    on<ValidateMockOtp>(_validateMockOtp);
   }
 
   void _loginWithPhone(LoginWithPhone event, Emitter<LoginState> emit) {
@@ -32,7 +34,8 @@ class LoginBloc extends Bloc<LoginEvent, LoginState> {
     final number = event.phoneNumber;
 
     try {
-      final isSent = await firebaseServices.sendOtp(number).whenComplete(() async {
+      final isSent =
+          await firebaseServices.sendOtp(number).whenComplete(() async {
         await Future.delayed(Duration(seconds: 5));
       });
 
@@ -41,14 +44,13 @@ class LoginBloc extends Bloc<LoginEvent, LoginState> {
           isOtpSent: isSent,
           loginStatus: LoadingStatus.success,
         ));
-      }else{
+      } else {
         emit(state.copyWith(
           loginStatus: LoadingStatus.error,
-          errorMessage:'OTP not sent',
+          errorMessage: 'OTP not sent',
         ));
       }
     } catch (error) {
-
       emit(state.copyWith(
         loginStatus: LoadingStatus.error,
         errorMessage: error.toString(),
@@ -58,40 +60,56 @@ class LoginBloc extends Bloc<LoginEvent, LoginState> {
 
   void _validateOtp(ValidateOTP event, Emitter<LoginState> emit) async {
     final otp = event.otp;
-    final bool isVerified =
-        await firebaseServices.verifyOtp( otp);
+    final bool isVerified = await firebaseServices.verifyOtp(otp);
     emit(state.copyWith(
         isVerified: isVerified,
         loginStatus: isVerified ? LoadingStatus.success : LoadingStatus.error));
   }
 
   void _validateUser(ValidateUser event, Emitter<LoginState> emit) async {
-
     emit(state.copyWith(loginStatus: LoadingStatus.loading));
 
-    Map data ={
-      "email": event.email,
-      "password":event.password
-    };
-
+    Map data = {"email": event.email, "password": event.password};
 
     await loginRepository.loginApi(data).then((response) async {
-      if(response.message == null || response.message!.isEmpty){
+      if (response.message == null || response.message!.isEmpty) {
         await SessionController().saveUserInPreference(response);
         await SessionController().getUserFromPreference();
         emit(state.copyWith(loginStatus: LoadingStatus.success));
-      }else{
-        emit(state.copyWith(loginStatus: LoadingStatus.error, errorMessage: '${response.message}\nPlease check your credentials'));
+      } else {
+        emit(state.copyWith(
+            loginStatus: LoadingStatus.error,
+            errorMessage:
+                '${response.message}\nPlease check your credentials'));
       }
-    }).onError((error,stackTree){
-      emit(state.copyWith(errorMessage: error.toString(),loginStatus: LoadingStatus.error));
+    }).onError((error, stackTree) {
+      emit(state.copyWith(
+          errorMessage: error.toString(), loginStatus: LoadingStatus.error));
     });
-
   }
 
-  void _showPassword(HidePassword evet, Emitter<LoginState> emit){
-    emit(state.copyWith(isHidePassword : !state.isHidePassword));
+  void _showPassword(HidePassword evet, Emitter<LoginState> emit) {
+    emit(state.copyWith(isHidePassword: !state.isHidePassword));
   }
 
+  void _sendMockOtp(SendMockOtp event, Emitter<LoginState> emit) async {
+    emit(state.copyWith(loginStatus: LoadingStatus.loading));
+    await Future.delayed(Duration(seconds: 2), () {
+      if (state.mockNumber == event.mockNumber) {
+        emit(state.copyWith(loginStatus: LoadingStatus.success,errorMessage: ''));
+      } else {
+        emit(state.copyWith(
+            loginStatus: LoadingStatus.error,
+            errorMessage: 'Invalid phone number'));
+      }
+    });
+  }
 
+  void _validateMockOtp(ValidateMockOtp event, Emitter<LoginState> emit) {
+    if (state.mockOtp == event.otp) {
+      emit(state.copyWith(isVerified: true));
+    } else {
+      emit(state.copyWith(isVerified: false, errorMessage: 'Incorrect OTP'));
+    }
+  }
 }
