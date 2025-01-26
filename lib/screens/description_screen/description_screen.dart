@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:youbloomdemo/bloc/description_bloc/description_bloc.dart';
+import 'package:youbloomdemo/bloc/description_bloc/description_event.dart';
 import 'package:youbloomdemo/config/color/color.dart';
 import 'package:youbloomdemo/config/text_style/text_style.dart';
 import 'package:youbloomdemo/model/product_model.dart';
@@ -18,7 +21,7 @@ class DescriptionScreen extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               _backButton(size,context),
-              _description(),
+              _description(context),
             ],
           ),
         ),
@@ -71,7 +74,7 @@ Widget _backButton(Size size, BuildContext context){
 
 
 // Description widget
-  Widget _description(){
+  Widget _description(BuildContext context){
     return  Transform.translate(
       offset: const Offset(0, -30),
       child: Container(
@@ -221,7 +224,9 @@ Widget _backButton(Size size, BuildContext context){
                     ],
                   ),
                   ElevatedButton(
-                    onPressed: () {},
+                    onPressed: () {
+                      context.read<DescriptionBloc>().add(AddToCart());
+                    },
                     style: ElevatedButton.styleFrom(
                       backgroundColor: AppColor.primaryColor.withOpacity(0.7),
                       foregroundColor: AppColor.whiteColor,

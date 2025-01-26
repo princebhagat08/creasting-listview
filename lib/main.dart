@@ -1,6 +1,7 @@
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:youbloomdemo/bloc/description_bloc/description_bloc.dart';
 import 'package:youbloomdemo/bloc/home_bloc/home_bloc.dart';
 import 'package:youbloomdemo/bloc/login_bloc/login_bloc.dart';
 import 'package:youbloomdemo/config/routes/routes.dart';
@@ -27,6 +28,7 @@ class MyApp extends StatelessWidget {
       providers: [
         BlocProvider(create: (_) => LoginBloc()),
         BlocProvider(create: (_) => HomeBloc()),
+        BlocProvider(create: (_) => DescriptionBloc()),
       ],
       child: MaterialApp(
         title: 'Youbloom Demo',
