@@ -4,11 +4,11 @@ import 'package:youbloomdemo/utils/app_url.dart';
 
 class LoginRepository {
 
-  final _apiService  = NetworkApiServices() ;
+   NetworkApiServices apiService  = NetworkApiServices() ;
 
 
   Future<LoginModel> loginApi(var data) async{
-    dynamic response = await _apiService.postApi(data, AppUrl.loginApi);
+    dynamic response = await apiService.postApi(data, AppUrl.loginApi);
     return LoginModel.fromJson(response) ;
   }
 
