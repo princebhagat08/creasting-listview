@@ -7,9 +7,8 @@ import 'package:youbloomdemo/services/session_manager/session_controller.dart';
 import 'package:youbloomdemo/utils/enums.dart';
 
 class LoginBloc extends Bloc<LoginEvent, LoginState> {
-  FirebaseServices firebaseServices = FirebaseServices();
-  LoginRepository loginRepository = LoginRepository();
-
+  final FirebaseServices firebaseServices = FirebaseServices();
+  final LoginRepository loginRepository = LoginRepository();
   LoginBloc() : super(const LoginState()) {
     on<LoginWithPhone>(_loginWithPhone);
     on<LoginWithEmail>(_loginWithEmail);
@@ -76,26 +75,30 @@ class LoginBloc extends Bloc<LoginEvent, LoginState> {
   void _validateUser(ValidateUser event, Emitter<LoginState> emit) async {
     emit(state.copyWith(loginStatus: LoadingStatus.loading));
 
-    Map data = {"email": event.email, "password": event.password};
+    try {
+      Map data = {"email": event.email, "password": event.password};
 
-    await loginRepository.loginApi(data).then((response) async {
-      if (response.message == null || response.message!.isEmpty) {
-        await SessionController().saveUserInPreference(response);
-        await SessionController().getUserFromPreference();
-        emit(state.copyWith(loginStatus: LoadingStatus.success));
-      } else {
-        emit(state.copyWith(
-            loginStatus: LoadingStatus.error,
-            errorMessage:
-                '${response.message}\nPlease check your credentials'));
-      }
-    }).onError((error, stackTree) {
+      await loginRepository.loginApi(data).then((response) async {
+        if (response != null && response.message == null ||
+            response.message!.isEmpty) {
+          await SessionController().saveUserInPreference(response);
+          await SessionController().getUserFromPreference();
+          emit(state.copyWith(loginStatus: LoadingStatus.success));
+        } else {
+          emit(state.copyWith(
+              loginStatus: LoadingStatus.error,
+              errorMessage: response?.message ??
+                  'Invalid credentials. Please try again.'));
+        }
+      });
+    } catch (error) {
       emit(state.copyWith(
-          errorMessage: error.toString(), loginStatus: LoadingStatus.error));
-    });
+          loginStatus: LoadingStatus.error,
+          errorMessage: 'Invalid credentials. Please try again.'));
+    }
   }
 
-  void _showPassword(HidePassword evet, Emitter<LoginState> emit) {
+  void _showPassword(HidePassword event, Emitter<LoginState> emit) {
     emit(state.copyWith(isHidePassword: !state.isHidePassword));
   }
 
