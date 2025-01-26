@@ -90,47 +90,43 @@ class OtpScreen extends StatelessWidget {
 
                 SizedBox(height: size.height * 0.05),
                 // Verify button
-                BlocBuilder<LoginBloc, LoginState>(builder: (context, state) {
-                  return SizedBox(
-                    width: double.infinity,
-                    height: size.height * 0.06, // 6% of screen height
-                    child: ElevatedButton(
-                      onPressed: () {
-                        if (otp != null || otp.isNotEmpty) {
-
-                          if(otp.length == 6){
-                            // Validating real otp from firebase
-
-                            // context
-                            //     .read<LoginBloc>()
-                            //     .add(ValidateOTP( getOtp()));
-
-                            // Mock Otp validation
-                            context.read<LoginBloc>().add(ValidateMockOtp(otp));
-
-                            // Navigate to home screen
-                            state.isVerified
-                                ? Navigator.pushReplacementNamed(
-                                context, RoutesName.home)
-                                : Fluttertoast.showToast(msg: state.errorMessage ?? 'Something went wrong' );
-
-                          }
-
+              BlocListener<LoginBloc, LoginState>(
+                listener: (context, state) {
+                  if (state.isVerified) {
+                    Navigator.pushReplacementNamed(context, RoutesName.home);
+                  } else if (state.errorMessage != null && state.errorMessage!.isNotEmpty) {
+                    Fluttertoast.showToast(msg: state.errorMessage ?? 'Something went wrong');
+                  }
+                },
+                child: SizedBox(
+                  width: double.infinity,
+                  height: size.height * 0.06,
+                  child: ElevatedButton(
+                    onPressed: () {
+                      if (otp != null && otp.isNotEmpty) {
+                        if (otp.length == 6) {
+                          context.read<LoginBloc>().add(ValidateMockOtp(otp));
+                        } else {
+                          Fluttertoast.showToast(msg: 'OTP must be 6 digits');
                         }
-                      },
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: AppColor.primaryColor,
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(size.width * 0.03),
-                        ),
-                      ),
-                      child: Text(
-                        'Verify',
-                        style: mediumWhiteText,
+                      } else {
+                        Fluttertoast.showToast(msg: 'Please enter the OTP');
+                      }
+                    },
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: AppColor.primaryColor,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(size.width * 0.03),
                       ),
                     ),
-                  );
-                }),
+                    child: Text(
+                      'Verify',
+                      style: mediumWhiteText,
+                    ),
+                  ),
+                ),
+              ),
+
 
                 SizedBox(height: size.height * 0.025),
                 // Resend code text
