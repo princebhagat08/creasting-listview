@@ -54,6 +54,7 @@ class _HomeScreenState extends State<HomeScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final size = MediaQuery.of(context).size;
     return Scaffold(
       body: SafeArea(
         child: GestureDetector(
@@ -82,7 +83,7 @@ class _HomeScreenState extends State<HomeScreen> {
                     builder: (context, state) {
                       if (state.productStatus == LoadingStatus.loading &&
                           !state.isLoadingMore) {
-                        return _buildShimmerEffect();
+                        return _buildShimmerEffect(size);
                       }
 
                       if (state.productStatus == LoadingStatus.error) {
@@ -110,7 +111,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                     child: (state.filteredData.isNotEmpty ||
                                             index <
                                                 state.productData.length - 1)
-                                        ? _singleProductCard(context,product)
+                                        ? _singleProductCard(context,product,size)
                                         : CustomLoader(),
                                   );
                                 },
@@ -130,7 +131,7 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   // Shimmer effect for loading
-  Widget _buildShimmerEffect() {
+  Widget _buildShimmerEffect(Size size) {
     return ListView.builder(
       itemCount: 5,
       itemBuilder: (context, index) {
@@ -140,7 +141,7 @@ class _HomeScreenState extends State<HomeScreen> {
             baseColor: Colors.grey[300]!,
             highlightColor: Colors.grey[100]!,
             child: Container(
-              height: 250,
+              height: size.height*0.2,
               decoration: BoxDecoration(
                 color: Colors.white,
                 borderRadius: BorderRadius.circular(16),
@@ -177,14 +178,14 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
 // Single Product Card
-  Widget _singleProductCard(BuildContext context, Products product) {
+  Widget _singleProductCard(BuildContext context, Products product, Size size) {
     return InkWell(
       onTap: () {
         Navigator.of(context)
             .pushNamed(RoutesName.productDescription, arguments: product);
       },
       child: Container(
-        height: 250,
+        height: size.height*0.2,
         decoration: BoxDecoration(
           color: Colors.grey[200],
           borderRadius: BorderRadius.circular(16),
