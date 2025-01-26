@@ -25,8 +25,6 @@ class _HomeScreenState extends State<HomeScreen> {
   final TextEditingController searchController = TextEditingController();
   final FocusNode searchFocusNode = FocusNode();
 
-
-
   // Initializing and fetching the product list
   @override
   void initState() {
@@ -41,9 +39,9 @@ class _HomeScreenState extends State<HomeScreen> {
   void dispose() {
     searchController.dispose();
     searchFocusNode.dispose();
+    controller.dispose();
     super.dispose();
   }
-
 
   // Remove the focus from the search bar
   @override
@@ -100,19 +98,31 @@ class _HomeScreenState extends State<HomeScreen> {
                                 controller: controller,
                                 itemCount: state.filteredData.isNotEmpty
                                     ? state.filteredData.length
-                                    : state.productData.length,
+                                    : state.isLoadingMore ?state.productData.length+1 :state.productData.length + (state.hasMoreProducts ? 0 : 1),
                                 itemBuilder: (context, index) {
+                                  if (state.filteredData.isEmpty && state.isLoadingMore && index == state.productData.length) {
+                                    return const CustomLoader();
+                                  }
+
+                                  if (!state.hasMoreProducts && index == state.productData.length) {
+                                    return Center(
+                                      child: Padding(
+                                        padding: const EdgeInsets.all(16.0),
+                                        child: Text(
+                                          "No more products",
+                                          style: TextStyle(fontSize: 16, color: Colors.grey),
+                                        ),
+                                      ),
+                                    );
+                                  }
+
                                   final product = state.filteredData.isNotEmpty
                                       ? state.filteredData[index]
                                       : state.productData[index];
+
                                   return Padding(
-                                    padding:
-                                        const EdgeInsets.only(bottom: 16.0),
-                                    child: (state.filteredData.isNotEmpty ||
-                                            index <
-                                                state.productData.length - 1)
-                                        ? _singleProductCard(context,product,size)
-                                        : CustomLoader(),
+                                    padding: const EdgeInsets.only(bottom: 16.0),
+                                    child: _singleProductCard(context, product, size),
                                   );
                                 },
                               );
@@ -141,7 +151,7 @@ class _HomeScreenState extends State<HomeScreen> {
             baseColor: Colors.grey[300]!,
             highlightColor: Colors.grey[100]!,
             child: Container(
-              height: size.height*0.2,
+              height: size.height * 0.2,
               decoration: BoxDecoration(
                 color: Colors.white,
                 borderRadius: BorderRadius.circular(16),
@@ -185,7 +195,7 @@ class _HomeScreenState extends State<HomeScreen> {
             .pushNamed(RoutesName.productDescription, arguments: product);
       },
       child: Container(
-        height: size.height*0.25,
+        height: size.height * 0.25,
         decoration: BoxDecoration(
           color: Colors.grey[200],
           borderRadius: BorderRadius.circular(16),

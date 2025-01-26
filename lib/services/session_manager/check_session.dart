@@ -1,6 +1,4 @@
-
 import 'package:flutter/cupertino.dart';
-import 'package:youbloomdemo/config/routes/routes_name.dart';
 import 'package:youbloomdemo/services/session_manager/session_controller.dart';
 
 class CheckSession{

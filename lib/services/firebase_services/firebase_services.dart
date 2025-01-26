@@ -28,6 +28,7 @@ class FirebaseServices {
     } catch (e) {
       throw Exception(e);
     }
+    return null;
   }
 
     Future<bool> verifyOtp(String otp) async {
@@ -44,6 +45,7 @@ class FirebaseServices {
         return isVerified;
       }
     }
+
   }
 
 

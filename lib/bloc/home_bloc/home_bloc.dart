@@ -22,10 +22,12 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
     try {
       final productData = await homeRepository.getProduct(7, state.page);
       final productList = productData.products ?? [];
+      final hasMore = productList.isNotEmpty;
       final updatedProduct = [...state.productData, ...productList];
       emit(state.copyWith(
           productStatus: LoadingStatus.success,
           productData: updatedProduct,
+          hasMoreProducts: hasMore,
           isLoadingMore: false));
     } catch (e) {
       emit(state.copyWith(
@@ -36,7 +38,7 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
   void _scrollListener(ScrollListenerEvent event, Emitter<HomeState> emit) {
     final controller = event.controller;
     if (controller.position.pixels == controller.position.maxScrollExtent) {
-      if (!state.isLoadingMore) {
+      if (!state.isLoadingMore && state.hasMoreProducts) {
         final int newPage = state.page + 1;
         emit(state.copyWith(page: newPage, isLoadingMore: true));
         add(FetchProduct());

@@ -60,10 +60,17 @@ class LoginBloc extends Bloc<LoginEvent, LoginState> {
 
   void _validateOtp(ValidateOTP event, Emitter<LoginState> emit) async {
     final otp = event.otp;
-    final bool isVerified = await firebaseServices.verifyOtp(otp);
-    emit(state.copyWith(
-        isVerified: isVerified,
-        loginStatus: isVerified ? LoadingStatus.success : LoadingStatus.error));
+    try {
+      final bool isVerified = await firebaseServices.verifyOtp(otp);
+      emit(state.copyWith(
+          isVerified: isVerified,
+          loginStatus:
+              isVerified ? LoadingStatus.success : LoadingStatus.error));
+    } catch (error) {
+      emit(state.copyWith(
+          loginStatus: LoadingStatus.error,
+          errorMessage: 'Failed to verify OTP: ${error.toString()}'));
+    }
   }
 
   void _validateUser(ValidateUser event, Emitter<LoginState> emit) async {
@@ -96,7 +103,8 @@ class LoginBloc extends Bloc<LoginEvent, LoginState> {
     emit(state.copyWith(loginStatus: LoadingStatus.loading));
     await Future.delayed(Duration(seconds: 2), () {
       if (state.mockNumber == event.mockNumber) {
-        emit(state.copyWith(loginStatus: LoadingStatus.success,errorMessage: ''));
+        emit(state.copyWith(
+            loginStatus: LoadingStatus.success, errorMessage: ''));
       } else {
         emit(state.copyWith(
             loginStatus: LoadingStatus.error,

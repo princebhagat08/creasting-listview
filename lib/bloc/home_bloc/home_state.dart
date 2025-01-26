@@ -8,6 +8,7 @@ class HomeState extends Equatable {
   final String message;
   final int page;
   final bool isLoadingMore;
+  final bool hasMoreProducts;
   final List<Products> filteredData;
 
   const HomeState({
@@ -16,6 +17,7 @@ class HomeState extends Equatable {
     this.message = '',
     this.page = 1,
     this.isLoadingMore = false,
+    this.hasMoreProducts = false,
     this.filteredData = const []
   });
 
@@ -25,7 +27,9 @@ class HomeState extends Equatable {
     String? message,
     int? page,
     bool? isLoadingMore,
+    bool? hasMoreProducts,
     List<Products>? filteredData
+
   }) {
     return HomeState(
       productStatus: productStatus ?? this.productStatus,
@@ -33,11 +37,12 @@ class HomeState extends Equatable {
       message: message ?? this.message,
       page: page ?? this.page,
       isLoadingMore: isLoadingMore ?? this.isLoadingMore,
+        hasMoreProducts: hasMoreProducts ?? this.hasMoreProducts,
       filteredData: filteredData ?? this.filteredData
     );
   }
 
   @override
   List<Object?> get props =>
-      [productStatus, productData, message,page,isLoadingMore, filteredData];
+      [productStatus, productData, message,page,isLoadingMore, hasMoreProducts, filteredData];
 }
