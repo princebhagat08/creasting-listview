@@ -2,10 +2,12 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:intl_phone_field/intl_phone_field.dart';
+import 'package:youbloomdemo/bloc/language_bloc/language_bloc.dart';
 import 'package:youbloomdemo/bloc/login_bloc/login_bloc.dart';
 import 'package:youbloomdemo/bloc/login_bloc/login_event.dart';
 import 'package:youbloomdemo/bloc/login_bloc/login_state.dart';
 import 'package:youbloomdemo/config/images/images.dart';
+import 'package:youbloomdemo/config/internationalization/language.dart';
 import 'package:youbloomdemo/config/routes/routes_name.dart';
 import 'package:youbloomdemo/config/text_style/text_style.dart';
 import 'package:youbloomdemo/utils/custom_widgets/custom_alert_dialog.dart';
@@ -25,7 +27,7 @@ class _LoginScreenState extends State<LoginScreen> {
   final _phoneController = TextEditingController();
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
-
+  final Language language = Language();
   bool isValidPhoneNumber = false;
   String completeNumber = '';
 
@@ -85,7 +87,7 @@ class _LoginScreenState extends State<LoginScreen> {
         children: [
           Image.asset(loginImg),
           const SizedBox(height: 20),
-          Text('Welcome Back', style: xLargeBoldText),
+          Text( language.getText('welcome_back'), style: xLargeBoldText),
         ],
       ),
     );
@@ -166,7 +168,7 @@ class _LoginScreenState extends State<LoginScreen> {
                           : null,
                     ),
                     child: Text(
-                      'Phone',
+                      language.getText('phone'),
                       textAlign: TextAlign.center,
                       style: TextStyle(
                         color: state.isLoginWithPhone
@@ -204,7 +206,7 @@ class _LoginScreenState extends State<LoginScreen> {
                           : null,
                     ),
                     child: Text(
-                      'Email',
+                      language.getText('email'),
                       textAlign: TextAlign.center,
                       style: TextStyle(
                         color: !state.isLoginWithPhone
@@ -233,7 +235,7 @@ class _LoginScreenState extends State<LoginScreen> {
                   ? IntlPhoneField(
                 controller: _phoneController,
                 decoration: InputDecoration(
-                  labelText: 'Phone Number',
+                  labelText: language.getText('phone_number'),
                   labelStyle: TextStyle(
                       color: AppColor.blackColor),
                   border: OutlineInputBorder(
@@ -257,7 +259,7 @@ class _LoginScreenState extends State<LoginScreen> {
                 ),
                 initialCountryCode: 'IN',
                 invalidNumberMessage:
-                'Invalid phone number',
+                language.getText('invalid_phone_number'),
                 onChanged: (phone) {
                   try {
                     isValidPhoneNumber =
@@ -267,24 +269,13 @@ class _LoginScreenState extends State<LoginScreen> {
                     isValidPhoneNumber = false;
                   }
                 },
-                // validator: (value) {
-                //   if (value == null ||
-                //       value.number.isEmpty) {
-                //     return 'Enter valid number';
-                //   }
-                //
-                //   if (!value.isValidNumber()) {
-                //     return 'Invalid number';
-                //   }
-                //   return null;
-                // },
               )
                   : Column(
                 children: [
                   TextFormField(
                     controller: _emailController,
                     decoration: InputDecoration(
-                      labelText: 'Email',
+                      labelText: language.getText('email'),
                       labelStyle: TextStyle(
                           color: AppColor.blackColor),
                       prefixIcon: Icon(
@@ -303,12 +294,12 @@ class _LoginScreenState extends State<LoginScreen> {
                     validator: (value) {
                       if (value == null ||
                           value.isEmpty) {
-                        return 'Please enter email';
+                        return language.getText('please_enter_email');
                       }
                       if (!RegExp(
                           r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$')
                           .hasMatch(value)) {
-                        return 'Please enter valid email';
+                        return language.getText('please_enter_valid_email');
                       }
                       return null;
                     },
@@ -320,7 +311,7 @@ class _LoginScreenState extends State<LoginScreen> {
                     controller: _passwordController,
                     obscureText: state.isHidePassword,
                     decoration: InputDecoration(
-                      labelText: 'Password',
+                      labelText: language.getText('password'),
                       labelStyle: TextStyle(
                           color: AppColor.blackColor),
                       prefixIcon: Icon(Icons.lock_outline,
@@ -342,7 +333,7 @@ class _LoginScreenState extends State<LoginScreen> {
                     validator: (value) {
                       if (value == null ||
                           value.isEmpty) {
-                        return 'Please enter password';
+                        return language.getText('please_enter_password');
                       }
                       return null;
                     },
@@ -354,6 +345,7 @@ class _LoginScreenState extends State<LoginScreen> {
 
 //   Login Button
  Widget _loginButton(){
+   final language = context.read<LanguageBloc>().language;
     return BlocListener<LoginBloc, LoginState>(
       listenWhen: (current, previous)=>current.loginStatus != previous.loginStatus,
       listener:(context,state){
@@ -363,7 +355,7 @@ class _LoginScreenState extends State<LoginScreen> {
               builder: (context) =>
                   CustomAlertDialog(
                     title: "Error",
-                    content: Text(state.errorMessage ?? 'Something went wrong'),
+                    content: Text(language.getText(state.errorMessage??'something_went_wrong')),
                     actions: [
                       TextButton(
                           onPressed: () {
@@ -379,7 +371,7 @@ class _LoginScreenState extends State<LoginScreen> {
             Navigator.pushReplacementNamed(
               context, RoutesName.otp,);
           }else{
-            Fluttertoast.showToast(msg: 'Login Successful');
+            Fluttertoast.showToast(msg: language.getText('login_successful'));
             Navigator.pushReplacementNamed(context, RoutesName.home);
           }
 
@@ -396,6 +388,7 @@ class _LoginScreenState extends State<LoginScreen> {
                   if (state.isLoginWithPhone) {
                     if (isValidPhoneNumber) {
                       // sending otp via firebase
+                      
                       // context
                       //     .read<LoginBloc>()
                       //     .add(SendPhoneOTP(completeNumber));
@@ -406,7 +399,7 @@ class _LoginScreenState extends State<LoginScreen> {
 
                     } else {
                       Fluttertoast.showToast(
-                          msg: 'Enter Valid phone number');
+                          msg: language.getText('enter_valid_phone_number'));
                     }
                   } else {
                     if (_formKey.currentState!.validate()) {
@@ -428,7 +421,7 @@ class _LoginScreenState extends State<LoginScreen> {
                   primaryColor: AppColor.whiteColor,
                 )
                     : Text(
-                  'Login',
+                  language.getText('login'),
                   style: TextStyle(
                     fontSize: 18,
                     fontWeight: FontWeight.bold,

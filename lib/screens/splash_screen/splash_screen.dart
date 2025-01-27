@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:youbloomdemo/config/color/color.dart';
+import 'package:youbloomdemo/config/internationalization/language.dart';
 import 'package:youbloomdemo/config/text_style/text_style.dart';
 import 'package:youbloomdemo/services/splash_services/splash_services.dart';
 
@@ -10,10 +11,12 @@ class SplashScreen extends StatefulWidget {
   State<SplashScreen> createState() => _SplashScreenState();
 }
 
-class _SplashScreenState extends State<SplashScreen>  with SingleTickerProviderStateMixin{
+class _SplashScreenState extends State<SplashScreen>
+    with SingleTickerProviderStateMixin {
   final SplashServices splashServices = SplashServices();
   late AnimationController _controller;
   late Animation<double> _animation;
+  final Language language = Language();
 
   @override
   void initState() {
@@ -27,20 +30,17 @@ class _SplashScreenState extends State<SplashScreen>  with SingleTickerProviderS
     splashServices.checkAuthentication(context);
   }
 
-
   @override
   void dispose() {
     _controller.dispose();
     super.dispose();
   }
 
-
-
   @override
   Widget build(BuildContext context) {
     final mq = MediaQuery.of(context).size;
     return Scaffold(
-      body:Container(
+      body: Container(
         height: mq.height,
         width: mq.width,
         color: AppColor.primaryColor.withOpacity(0.7),
@@ -50,7 +50,10 @@ class _SplashScreenState extends State<SplashScreen>  with SingleTickerProviderS
             const Spacer(),
             ScaleTransition(
               scale: _animation,
-              child: Text('Demo Splash',style: xLargeWhiteText,),
+              child: Text(
+                language.getText('demo_splash'),
+                style: xLargeWhiteText,
+              ),
             ),
             const Spacer(),
           ],

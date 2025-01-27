@@ -4,10 +4,14 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:youbloomdemo/bloc/home_bloc/home_bloc.dart';
 import 'package:youbloomdemo/bloc/home_bloc/home_event.dart';
 import 'package:youbloomdemo/bloc/home_bloc/home_state.dart';
+import 'package:youbloomdemo/bloc/language_bloc/language_bloc.dart';
+import 'package:youbloomdemo/bloc/language_bloc/language_event.dart';
 import 'package:youbloomdemo/bloc/login_bloc/login_bloc.dart';
 import 'package:youbloomdemo/bloc/login_bloc/login_event.dart';
 import 'package:youbloomdemo/config/color/color.dart';
+import 'package:youbloomdemo/config/internationalization/language.dart';
 import 'package:youbloomdemo/config/routes/routes_name.dart';
+import 'package:youbloomdemo/config/text_style/text_style.dart';
 import 'package:youbloomdemo/model/product_model.dart';
 import 'package:youbloomdemo/utils/custom_widgets/custom_loader.dart';
 import 'package:youbloomdemo/utils/enums.dart';
@@ -45,14 +49,17 @@ class _HomeScreenState extends State<HomeScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final language = context.read<LanguageBloc>().language;
     final size = MediaQuery.of(context).size;
     return Scaffold(
       appBar: AppBar(
         backgroundColor: AppColor.offWhite,
         title: _searchbar(),
         actions: [
+          _changeLanguage(),
           _logout(),
         ],
+        toolbarHeight: 80,
       ),
       body: SafeArea(
         child: GestureDetector(
@@ -69,14 +76,14 @@ class _HomeScreenState extends State<HomeScreen> {
                 }
 
                 if (state.productStatus == LoadingStatus.error) {
-                  return Center(child: Text(state.message));
+                  return Center(child: Text(language.getText(state.message),));
                 }
 
                 if (state.productStatus == LoadingStatus.success ||
                     state.isLoadingMore) {
                   return state.message.isNotEmpty
                       ? Center(
-                          child: Text(state.message),
+                          child: Text(language.getText(state.message),),
                         )
                       : ListView.builder(
                           controller: controller,
@@ -99,7 +106,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                 child: Padding(
                                   padding: const EdgeInsets.all(16.0),
                                   child: Text(
-                                    "No more products",
+                                    language.getText('no_more_products'),
                                     style: TextStyle(
                                         fontSize: 16, color: Colors.grey),
                                   ),
@@ -119,7 +126,10 @@ class _HomeScreenState extends State<HomeScreen> {
                         );
                 }
 
-                return const Center(child: Text('No products available'));
+                return Center(
+                    child: Text(
+                  language.getText('no_product_fount'),
+                ));
               },
             ),
           ),
@@ -153,41 +163,77 @@ class _HomeScreenState extends State<HomeScreen> {
 
 // Search bar
   Widget _searchbar() {
-    return TextField(
-      controller: searchController,
-      focusNode: searchFocusNode,
-      decoration: InputDecoration(
-        hintText: 'Search products...',
-        prefixIcon: const Icon(Icons.search),
-        border: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(12),
+    final language = context.read<LanguageBloc>().language;
+    return Container(
+      padding: EdgeInsets.symmetric(vertical: 12),
+      child: TextField(
+        controller: searchController,
+        focusNode: searchFocusNode,
+        decoration: InputDecoration(
+          hintText: language.getText('search_products'),
+          prefixIcon: const Icon(Icons.search),
+          border: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(12),
+          ),
+          filled: true,
+          fillColor: Colors.grey[200],
         ),
-        filled: true,
-        fillColor: Colors.grey[200],
+        onChanged: (value) {
+          if (value.trim().isEmpty) {
+            context.read<HomeBloc>().add(const FilterProduct(''));
+          } else {
+            context.read<HomeBloc>().add(FilterProduct(value));
+          }
+        },
       ),
-      onChanged: (value) {
-        if (value.trim().isEmpty) {
-          context.read<HomeBloc>().add(const FilterProduct(''));
-        } else {
-          context.read<HomeBloc>().add(FilterProduct(value));
-        }
-      },
     );
   }
 
 //   Widget logout
-  Widget _logout(){
-    return  IconButton(
+  Widget _logout() {
+    return IconButton(
         onPressed: () {
           context.read<LoginBloc>().add(LogoutUser());
           Navigator.pushNamedAndRemoveUntil(
               context, RoutesName.login, (route) => false);
         },
-        icon: Icon(Icons.logout_outlined));
+        icon: Icon(
+          Icons.logout_outlined,
+          color: Colors.red,
+        ));
+  }
+
+//   Change language button
+  Widget _changeLanguage() {
+    return DropdownButton<String>(
+      value: context.watch<LanguageBloc>().state.languageCode,
+      style: smallColorText,
+      icon: const Icon(
+        Icons.language,
+        color: AppColor.primaryColor,
+      ),
+      underline: Container(),
+      items: const [
+        DropdownMenuItem(
+          value: Language.english,
+          child: Text('English'),
+        ),
+        DropdownMenuItem(
+          value: Language.hindi,
+          child: Text('हिंदी'), // Hindi text
+        ),
+      ],
+      onChanged: (String? newValue) {
+        if (newValue != null) {
+          context.read<LanguageBloc>().add(ChangeLanguage(newValue));
+        }
+      },
+    );
   }
 
 // Single Product Card
   Widget _singleProductCard(BuildContext context, Products product, Size size) {
+    final language = context.read<LanguageBloc>().language;
     return InkWell(
       onTap: () {
         Navigator.of(context)
@@ -244,7 +290,8 @@ class _HomeScreenState extends State<HomeScreen> {
                           color: Colors.grey[300],
                           borderRadius: BorderRadius.circular(12),
                         ),
-                        child: Text('${product.stock} items'),
+                        child: Text(
+                            '${product.stock} ${language.getText('items')}'),
                       ),
                       Container(
                         padding: const EdgeInsets.all(8),

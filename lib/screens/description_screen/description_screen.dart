@@ -3,6 +3,7 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:youbloomdemo/bloc/description_bloc/description_bloc.dart';
 import 'package:youbloomdemo/bloc/description_bloc/description_event.dart';
+import 'package:youbloomdemo/bloc/language_bloc/language_bloc.dart';
 import 'package:youbloomdemo/config/color/color.dart';
 import 'package:youbloomdemo/config/text_style/text_style.dart';
 import 'package:youbloomdemo/model/product_model.dart';
@@ -20,7 +21,7 @@ class DescriptionScreen extends StatelessWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              _backButton(size,context),
+              _backButton(size, context),
               _description(context),
             ],
           ),
@@ -29,9 +30,8 @@ class DescriptionScreen extends StatelessWidget {
     );
   }
 
-
 //   ProductImage widget
-Widget _backButton(Size size, BuildContext context){
+  Widget _backButton(Size size, BuildContext context) {
     return Stack(
       children: [
         SizedBox(
@@ -69,19 +69,17 @@ Widget _backButton(Size size, BuildContext context){
         ),
       ],
     );
-}
-
-
+  }
 
 // Description widget
-  Widget _description(BuildContext context){
-    return  Transform.translate(
+  Widget _description(BuildContext context) {
+    final language = context.read<LanguageBloc>().language;
+    return Transform.translate(
       offset: const Offset(0, -30),
       child: Container(
         decoration: BoxDecoration(
           color: AppColor.lightGrey.withOpacity(0.5),
-          borderRadius:
-          const BorderRadius.vertical(top: Radius.circular(30)),
+          borderRadius: const BorderRadius.vertical(top: Radius.circular(30)),
         ),
         padding: const EdgeInsets.all(24.0),
         child: Column(
@@ -91,10 +89,7 @@ Widget _backButton(Size size, BuildContext context){
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 Expanded(
-                  child: Text(
-                      product.title!,
-                      style: xLargeBoldText
-                  ),
+                  child: Text(product.title!, style: xLargeBoldText),
                 ),
                 Container(
                   padding: const EdgeInsets.all(12),
@@ -109,8 +104,7 @@ Widget _backButton(Size size, BuildContext context){
                       ),
                     ],
                   ),
-                  child: const Icon(Icons.favorite_border,
-                      color: Colors.pink),
+                  child: const Icon(Icons.favorite_border, color: Colors.pink),
                 ),
               ],
             ),
@@ -128,8 +122,7 @@ Widget _backButton(Size size, BuildContext context){
                   ),
                   child: Row(
                     children: [
-                      Icon(Icons.star,
-                          size: 18, color: AppColor.deepOrange),
+                      Icon(Icons.star, size: 18, color: AppColor.deepOrange),
                       const SizedBox(width: 4),
                       Text(
                         product.rating.toString(),
@@ -155,7 +148,7 @@ Widget _backButton(Size size, BuildContext context){
                   child: Text(
                     '${product.stock} in stock',
                     style: TextStyle(
-                      color:AppColor.deepGreen,
+                      color: AppColor.deepGreen,
                       fontFamily: fontFamily,
                       fontWeight: FontWeight.w500,
                     ),
@@ -165,7 +158,7 @@ Widget _backButton(Size size, BuildContext context){
             ),
             const SizedBox(height: 24),
             Text(
-              'Description',
+             language.getText('description'),
               style: TextStyle(
                 fontSize: 20,
                 fontWeight: FontWeight.w600,
@@ -204,7 +197,7 @@ Widget _backButton(Size size, BuildContext context){
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        'Total Price',
+                        language.getText('total_price'),
                         style: TextStyle(
                           color: Colors.grey[600],
                           fontFamily: fontFamily,
@@ -214,7 +207,7 @@ Widget _backButton(Size size, BuildContext context){
                       const SizedBox(height: 4),
                       Text(
                         '\$${product.price}',
-                        style:  TextStyle(
+                        style: TextStyle(
                           fontSize: 28,
                           fontWeight: FontWeight.w700,
                           fontFamily: fontFamily,
@@ -240,10 +233,13 @@ Widget _backButton(Size size, BuildContext context){
                     ),
                     child: Row(
                       children: [
-                        Icon(Icons.shopping_bag_outlined,color: AppColor.whiteColor,),
+                        Icon(
+                          Icons.shopping_bag_outlined,
+                          color: AppColor.whiteColor,
+                        ),
                         SizedBox(width: 8),
                         Text(
-                          'Add to Cart',
+                         language.getText('add_to_cart'),
                           style: TextStyle(
                             fontSize: 12,
                             fontFamily: fontFamily,
@@ -261,6 +257,4 @@ Widget _backButton(Size size, BuildContext context){
       ),
     );
   }
-
-
 }

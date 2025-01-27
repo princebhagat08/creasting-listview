@@ -7,6 +7,7 @@ import 'package:youbloomdemo/bloc/login_bloc/login_event.dart';
 import 'package:youbloomdemo/bloc/login_bloc/login_state.dart';
 import 'package:youbloomdemo/config/color/color.dart';
 import 'package:youbloomdemo/config/images/images.dart';
+import 'package:youbloomdemo/config/internationalization/language.dart';
 import 'package:youbloomdemo/config/routes/routes_name.dart';
 import 'package:youbloomdemo/config/text_style/text_style.dart';
 import 'package:youbloomdemo/utils/custom_widgets/custom_alert_dialog.dart';
@@ -14,8 +15,10 @@ import 'package:youbloomdemo/utils/custom_widgets/custom_alert_dialog.dart';
 class OtpScreen extends StatelessWidget {
   const OtpScreen({super.key});
 
+
   @override
   Widget build(BuildContext context) {
+    final language = Language();
     // Get screen size
     final Size size = MediaQuery.of(context).size;
     String otp = '';
@@ -31,6 +34,7 @@ class OtpScreen extends StatelessWidget {
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
+                SizedBox(height: size.height*0.1,),
                 // Image and heading section
                 Image.asset(
                   otpLogo,
@@ -38,7 +42,7 @@ class OtpScreen extends StatelessWidget {
                 ),
                 SizedBox(height: size.height * 0.05), // 5% of screen height
                 Text(
-                  'Enter Verification Code',
+                  language.getText('enter_verification_code'),
                   style: TextStyle(
                     fontSize: size.width * 0.06,
                     fontFamily: fontFamily,
@@ -47,7 +51,7 @@ class OtpScreen extends StatelessWidget {
                 ),
                 SizedBox(height: size.height * 0.015),
                 Text(
-                  'We have sent a verification code to your mobile number',
+                  language.getText('verification_code_sent'),
                   textAlign: TextAlign.center,
                   style: TextStyle(
                     color: Colors.grey,
@@ -95,7 +99,7 @@ class OtpScreen extends StatelessWidget {
                   if (state.isVerified) {
                     Navigator.pushReplacementNamed(context, RoutesName.home);
                   } else if (state.errorMessage != null && state.errorMessage!.isNotEmpty) {
-                    Fluttertoast.showToast(msg: state.errorMessage ?? 'Something went wrong');
+                    Fluttertoast.showToast(msg: state.errorMessage ?? language.getText('something_went_wrong'),);
                   }
                 },
                 child: SizedBox(
@@ -107,10 +111,10 @@ class OtpScreen extends StatelessWidget {
                         if (otp.length == 6) {
                           context.read<LoginBloc>().add(ValidateMockOtp(otp));
                         } else {
-                          Fluttertoast.showToast(msg: 'OTP must be 6 digits');
+                          Fluttertoast.showToast(msg: language.getText('Otp_length_error'));
                         }
                       } else {
-                        Fluttertoast.showToast(msg: 'Please enter the OTP');
+                        Fluttertoast.showToast(msg: language.getText('enter_otp'),);
                       }
                     },
                     style: ElevatedButton.styleFrom(
@@ -120,7 +124,7 @@ class OtpScreen extends StatelessWidget {
                       ),
                     ),
                     child: Text(
-                      'Verify',
+                      language.getText('verify'),
                       style: mediumWhiteText,
                     ),
                   ),
@@ -134,7 +138,7 @@ class OtpScreen extends StatelessWidget {
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     Text(
-                      "Didn't receive the code? ",
+                      language.getText('didnt_receive_code'),
                       style: TextStyle(
                         color: Colors.grey,
                         fontFamily: fontFamily,
@@ -146,7 +150,7 @@ class OtpScreen extends StatelessWidget {
                         // Add resend logic here
                       },
                       child: Text(
-                        'Resend',
+                        language.getText('resend'),
                         style: smallBoldColorText,
                       ),
                     ),

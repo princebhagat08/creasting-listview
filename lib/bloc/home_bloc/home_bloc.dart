@@ -31,7 +31,7 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
           isLoadingMore: false));
     } catch (e) {
       emit(state.copyWith(
-          productStatus: LoadingStatus.error, message: e.toString()));
+          productStatus: LoadingStatus.error, message: 'something_went_wrong'));
     }
   }
 
@@ -47,24 +47,26 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
   }
 
   void _filterProduct(FilterProduct event, Emitter<HomeState> emit) {
-    if(event.key.isEmpty){
-      emit(state.copyWith(filteredData: [],message: ''));
-    }else{
+    if (event.key.isEmpty) {
+      emit(state.copyWith(filteredData: [], message: ''));
+    } else {
       final searchedKey = event.key.toLowerCase();
-      filteredList = state.productData.where((product) =>
-      product.title!.toString().toLowerCase().contains(searchedKey) ||
-          product.description!.toString().toLowerCase().contains(searchedKey) ||
-          product.category!.toString().toLowerCase().contains(searchedKey))
+      filteredList = state.productData
+          .where((product) =>
+              product.title!.toString().toLowerCase().contains(searchedKey) ||
+              product.description!
+                  .toString()
+                  .toLowerCase()
+                  .contains(searchedKey) ||
+              product.category!.toString().toLowerCase().contains(searchedKey))
           .toList();
 
-      if(filteredList.isEmpty){
-        emit(state.copyWith(message: 'No Data Found',));
-      }else{
-        emit(state.copyWith(filteredData: filteredList,message: ''));
+      if (filteredList.isEmpty) {
+        emit(state.copyWith(
+          message: 'no_products_found'),);
+      } else {
+        emit(state.copyWith(filteredData: filteredList, message: ''));
       }
-
     }
-
-
   }
 }

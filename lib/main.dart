@@ -3,12 +3,13 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:youbloomdemo/bloc/description_bloc/description_bloc.dart';
 import 'package:youbloomdemo/bloc/home_bloc/home_bloc.dart';
+import 'package:youbloomdemo/bloc/language_bloc/language_state.dart';
 import 'package:youbloomdemo/bloc/login_bloc/login_bloc.dart';
+import 'package:youbloomdemo/config/internationalization/language.dart';
 import 'package:youbloomdemo/config/routes/routes.dart';
 import 'package:youbloomdemo/config/routes/routes_name.dart';
 import 'package:youbloomdemo/services/firebase_services/firebase_options.dart';
-
-
+import 'bloc/language_bloc/language_bloc.dart';
 
 import 'config/color/color.dart';
 
@@ -17,7 +18,10 @@ void main() async {
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   );
-  runApp(const MyApp());
+  runApp( BlocProvider(
+  create: (context) => LanguageBloc(),
+  child: MyApp(),
+  ),);
 }
 
 class MyApp extends StatelessWidget {
@@ -30,6 +34,7 @@ class MyApp extends StatelessWidget {
         BlocProvider(create: (_) => LoginBloc()),
         BlocProvider(create: (_) => HomeBloc()),
         BlocProvider(create: (_) => DescriptionBloc()),
+        BlocProvider(create: (_) => LanguageBloc()),
       ],
       child: MaterialApp(
         title: 'Youbloom Demo',
@@ -41,7 +46,9 @@ class MyApp extends StatelessWidget {
         ),
         initialRoute: RoutesName.splash, // Initial route
         onGenerateRoute: Routes.generateRoute,
+        locale: Locale(Language.getCurrentLanguage(context)),
       ),
+
     );
   }
 }

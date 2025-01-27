@@ -51,13 +51,13 @@ class LoginBloc extends Bloc<LoginEvent, LoginState> {
       } else {
         emit(state.copyWith(
           loginStatus: LoadingStatus.error,
-          errorMessage: 'OTP not sent',
+          errorMessage: 'invalid_credentials',
         ));
       }
     } catch (error) {
       emit(state.copyWith(
         loginStatus: LoadingStatus.error,
-        errorMessage: error.toString(),
+        errorMessage: 'invalid_credentials',
       ));
     }
   }
@@ -74,7 +74,7 @@ class LoginBloc extends Bloc<LoginEvent, LoginState> {
     } catch (error) {
       emit(state.copyWith(
           loginStatus: LoadingStatus.error,
-          errorMessage: 'Failed to verify OTP: ${error.toString()}'));
+          errorMessage: 'invalid_otp'));
     }
   }
 
@@ -94,13 +94,13 @@ class LoginBloc extends Bloc<LoginEvent, LoginState> {
           emit(state.copyWith(
               loginStatus: LoadingStatus.error,
               errorMessage: response?.message ??
-                  'Invalid credentials. Please try again.'));
+                  'invalid_credentials'));
         }
       });
     } catch (error) {
       emit(state.copyWith(
           loginStatus: LoadingStatus.error,
-          errorMessage: 'Invalid credentials. Please try again.'));
+          errorMessage: 'invalid_credentials'));
     }
   }
 
@@ -119,7 +119,7 @@ class LoginBloc extends Bloc<LoginEvent, LoginState> {
       } else {
         emit(state.copyWith(
             loginStatus: LoadingStatus.error,
-            errorMessage: 'Invalid phone number'));
+            errorMessage: 'invalid_phone_number'));
       }
     });
   }
@@ -132,7 +132,7 @@ class LoginBloc extends Bloc<LoginEvent, LoginState> {
       await SessionController().saveUserInPreference(LoginModel(accessToken: mockToken));
       await SessionController().getUserFromPreference();
     } else {
-      emit(state.copyWith(isVerified: false, errorMessage: 'Incorrect OTP'));
+      emit(state.copyWith(isVerified: false, errorMessage: 'invalid_otp'));
     }
   }
 
