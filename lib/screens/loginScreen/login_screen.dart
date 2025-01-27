@@ -27,7 +27,6 @@ class _LoginScreenState extends State<LoginScreen> {
   final _phoneController = TextEditingController();
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
-  final Language language = Language();
   bool isValidPhoneNumber = false;
   String completeNumber = '';
 
@@ -81,6 +80,7 @@ class _LoginScreenState extends State<LoginScreen> {
 
 //   Logo/Branding section
   Widget _logo(){
+    final language = context.read<LanguageBloc>().language;
     return  Container(
       margin: const EdgeInsets.only(bottom: 40),
       child: Column(
@@ -132,6 +132,7 @@ class _LoginScreenState extends State<LoginScreen> {
 
 //  Toggle Button
   Widget _toggleButton(){
+    final language = context.read<LanguageBloc>().language;
     return  BlocBuilder<LoginBloc, LoginState>(
       builder: (context, state) {
         return Container(
@@ -227,6 +228,7 @@ class _LoginScreenState extends State<LoginScreen> {
 
   // Input field
   Widget _inputField(){
+    final language = context.read<LanguageBloc>().language;
     return   BlocBuilder<LoginBloc, LoginState>(
         builder: (context, state) {
           return AnimatedSwitcher(
