@@ -1,20 +1,43 @@
-<<<<<<< HEAD
-# youbloomdemo
 
-A new Flutter project.
+# flutter listview demo
+
+A flutter project to demonstrate the following:
+- BloC Pattern
+- API intergration (using http) 
+- Listview with pagination and Search functionality
+- Clean code and responsive UI
+- Unit and Bloc testing
+- Animations (animated loader, animated page transitions, etc)
+- Firebase Phone Auth
+- Managing users session using flutter_secure_storage
+- Internationalization
+
 
 ## Getting Started
+To setup the project start by cloning the repo to your local machine 
+``` 
+git clone https://github.com/princebhagat08/flutter-listview-demo
+```
 
-This project is a starting point for a Flutter application.
+Open the project in android studio or VSCode
+Run:
+```
+flutter pub get
+```
 
-A few resources to get you started if this is your first Flutter project:
+Attach the emulator and run without debugging.
+OR
+```
+flutter run
+```
 
-- [Lab: Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://docs.flutter.dev/cookbook)
+## Mock Credentials 
+Phone Number - +919876543210 <br>
+OTP - 582852
 
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
-=======
-# youbloomDemo
->>>>>>> 83c6f68edab506077d7812cd523baaea37bedc1e
+Email - john@mail.com <br>
+Password - changeme
+
+
+
+
