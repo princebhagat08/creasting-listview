@@ -140,9 +140,9 @@ class LoginBloc extends Bloc<LoginEvent, LoginState> {
   void _logout(LogoutUser event, Emitter<LoginState> emit)async{
     try{
       await SessionController().eraseUserData();
-      emit(state.copyWith(isLogout :true));
+      emit(state.copyWith(isLogout:true));
     }catch (e){
-      emit(state.copyWith(isLogout : false));
+      emit(state.copyWith(isLogout: false));
     }
 
 
