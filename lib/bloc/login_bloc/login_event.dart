@@ -48,3 +48,5 @@ class ValidateMockOtp extends LoginEvent{
   @override
   List<Object> get props => [];
 }
+
+class LogoutUser extends LoginEvent{}

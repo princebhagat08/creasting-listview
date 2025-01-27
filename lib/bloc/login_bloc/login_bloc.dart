@@ -1,6 +1,7 @@
 import 'package:bloc/bloc.dart';
 import 'package:youbloomdemo/bloc/login_bloc/login_event.dart';
 import 'package:youbloomdemo/bloc/login_bloc/login_state.dart';
+import 'package:youbloomdemo/model/login_model.dart';
 import 'package:youbloomdemo/repository/login_repo/login_repository.dart';
 import 'package:youbloomdemo/services/firebase_services/firebase_services.dart';
 import 'package:youbloomdemo/services/session_manager/session_controller.dart';
@@ -18,16 +19,20 @@ class LoginBloc extends Bloc<LoginEvent, LoginState> {
     on<HidePassword>(_showPassword);
     on<SendMockOtp>(_sendMockOtp);
     on<ValidateMockOtp>(_validateMockOtp);
+    on<LogoutUser>(_logout);
   }
 
+  // toggle to phone auth
   void _loginWithPhone(LoginWithPhone event, Emitter<LoginState> emit) {
     emit(state.copyWith(isLoginWithPhone: true));
   }
 
+  // toggle to email and password login
   void _loginWithEmail(LoginWithEmail event, Emitter<LoginState> emit) {
     emit(state.copyWith(isLoginWithPhone: false));
   }
 
+  // send otp using firebase
   void _sentOTP(SendPhoneOTP event, Emitter<LoginState> emit) async {
     emit(state.copyWith(loginStatus: LoadingStatus.loading));
     final number = event.phoneNumber;
@@ -57,6 +62,7 @@ class LoginBloc extends Bloc<LoginEvent, LoginState> {
     }
   }
 
+  // validate firebase otp
   void _validateOtp(ValidateOTP event, Emitter<LoginState> emit) async {
     final otp = event.otp;
     try {
@@ -72,6 +78,7 @@ class LoginBloc extends Bloc<LoginEvent, LoginState> {
     }
   }
 
+  // login user with email and password
   void _validateUser(ValidateUser event, Emitter<LoginState> emit) async {
     emit(state.copyWith(loginStatus: LoadingStatus.loading));
 
@@ -79,8 +86,7 @@ class LoginBloc extends Bloc<LoginEvent, LoginState> {
       Map data = {"email": event.email, "password": event.password};
 
       await loginRepository.loginApi(data).then((response) async {
-        if (response != null && response.message == null ||
-            response.message!.isEmpty) {
+        if (response != null && response.message == null ) {
           await SessionController().saveUserInPreference(response);
           await SessionController().getUserFromPreference();
           emit(state.copyWith(loginStatus: LoadingStatus.success));
@@ -98,10 +104,12 @@ class LoginBloc extends Bloc<LoginEvent, LoginState> {
     }
   }
 
+  // show or hide password
   void _showPassword(HidePassword event, Emitter<LoginState> emit) {
     emit(state.copyWith(isHidePassword: !state.isHidePassword));
   }
 
+  // send mock otp
   void _sendMockOtp(SendMockOtp event, Emitter<LoginState> emit) async {
     emit(state.copyWith(loginStatus: LoadingStatus.loading));
     await Future.delayed(Duration(seconds: 2), () {
@@ -116,11 +124,29 @@ class LoginBloc extends Bloc<LoginEvent, LoginState> {
     });
   }
 
-  void _validateMockOtp(ValidateMockOtp event, Emitter<LoginState> emit) {
+  // validate mock otp
+  void _validateMockOtp(ValidateMockOtp event, Emitter<LoginState> emit) async{
+    final String mockToken = 'kjaljsdlfjljglajdlkgjlkajdfkajkg';
     if (state.mockOtp == event.otp) {
       emit(state.copyWith(isVerified: true));
+      await SessionController().saveUserInPreference(LoginModel(accessToken: mockToken));
+      await SessionController().getUserFromPreference();
     } else {
       emit(state.copyWith(isVerified: false, errorMessage: 'Incorrect OTP'));
     }
   }
+
+//   logout user
+  void _logout(LogoutUser event, Emitter<LoginState> emit)async{
+    try{
+      await SessionController().eraseUserData();
+      emit(state.copyWith(isLogout :true));
+    }catch (e){
+      emit(state.copyWith(isLogout : false));
+    }
+
+
+  }
+
+
 }

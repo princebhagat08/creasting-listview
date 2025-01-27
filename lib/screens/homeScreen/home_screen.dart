@@ -4,14 +4,14 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:youbloomdemo/bloc/home_bloc/home_bloc.dart';
 import 'package:youbloomdemo/bloc/home_bloc/home_event.dart';
 import 'package:youbloomdemo/bloc/home_bloc/home_state.dart';
+import 'package:youbloomdemo/bloc/login_bloc/login_bloc.dart';
+import 'package:youbloomdemo/bloc/login_bloc/login_event.dart';
+import 'package:youbloomdemo/config/color/color.dart';
 import 'package:youbloomdemo/config/routes/routes_name.dart';
-import 'package:youbloomdemo/config/text_style/text_style.dart';
 import 'package:youbloomdemo/model/product_model.dart';
-import 'package:youbloomdemo/screens/description_screen/description_screen.dart';
 import 'package:youbloomdemo/utils/custom_widgets/custom_loader.dart';
 import 'package:youbloomdemo/utils/enums.dart';
 import 'package:shimmer/shimmer.dart';
-import 'package:youbloomdemo/config/routes/custom_page_route.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -43,17 +43,17 @@ class _HomeScreenState extends State<HomeScreen> {
     super.dispose();
   }
 
-  // Remove the focus from the search bar
-  @override
-  void didChangeDependencies() {
-    super.didChangeDependencies();
-    FocusScope.of(context).requestFocus(FocusNode());
-  }
-
   @override
   Widget build(BuildContext context) {
     final size = MediaQuery.of(context).size;
     return Scaffold(
+      appBar: AppBar(
+        backgroundColor: AppColor.offWhite,
+        title: _searchbar(),
+        actions: [
+          _logout(),
+        ],
+      ),
       body: SafeArea(
         child: GestureDetector(
           onTap: () {
@@ -61,78 +61,66 @@ class _HomeScreenState extends State<HomeScreen> {
           },
           child: Padding(
             padding: const EdgeInsets.all(16.0),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                // header
-                Text(
-                  'POPULAR PRODUCTS',
-                  style: xLargeBoldText,
-                ),
-                const SizedBox(height: 16),
+            child: BlocBuilder<HomeBloc, HomeState>(
+              builder: (context, state) {
+                if (state.productStatus == LoadingStatus.loading &&
+                    !state.isLoadingMore) {
+                  return _buildShimmerEffect(size);
+                }
 
-                // Search bar
-                _searchbar(),
-                const SizedBox(height: 16),
+                if (state.productStatus == LoadingStatus.error) {
+                  return Center(child: Text(state.message));
+                }
 
-                // ListView of Products
-                Expanded(
-                  child: BlocBuilder<HomeBloc, HomeState>(
-                    builder: (context, state) {
-                      if (state.productStatus == LoadingStatus.loading &&
-                          !state.isLoadingMore) {
-                        return _buildShimmerEffect(size);
-                      }
+                if (state.productStatus == LoadingStatus.success ||
+                    state.isLoadingMore) {
+                  return state.message.isNotEmpty
+                      ? Center(
+                          child: Text(state.message),
+                        )
+                      : ListView.builder(
+                          controller: controller,
+                          itemCount: state.filteredData.isNotEmpty
+                              ? state.filteredData.length
+                              : state.isLoadingMore
+                                  ? state.productData.length + 1
+                                  : state.productData.length +
+                                      (state.hasMoreProducts ? 0 : 1),
+                          itemBuilder: (context, index) {
+                            if (state.filteredData.isEmpty &&
+                                state.isLoadingMore &&
+                                index == state.productData.length) {
+                              return const CustomLoader();
+                            }
 
-                      if (state.productStatus == LoadingStatus.error) {
-                        return Center(child: Text(state.message));
-                      }
-
-                      if (state.productStatus == LoadingStatus.success ||
-                          state.isLoadingMore) {
-                        return state.message.isNotEmpty
-                            ? Center(
-                                child: Text(state.message),
-                              )
-                            : ListView.builder(
-                                controller: controller,
-                                itemCount: state.filteredData.isNotEmpty
-                                    ? state.filteredData.length
-                                    : state.isLoadingMore ?state.productData.length+1 :state.productData.length + (state.hasMoreProducts ? 0 : 1),
-                                itemBuilder: (context, index) {
-                                  if (state.filteredData.isEmpty && state.isLoadingMore && index == state.productData.length) {
-                                    return const CustomLoader();
-                                  }
-
-                                  if (!state.hasMoreProducts && index == state.productData.length) {
-                                    return Center(
-                                      child: Padding(
-                                        padding: const EdgeInsets.all(16.0),
-                                        child: Text(
-                                          "No more products",
-                                          style: TextStyle(fontSize: 16, color: Colors.grey),
-                                        ),
-                                      ),
-                                    );
-                                  }
-
-                                  final product = state.filteredData.isNotEmpty
-                                      ? state.filteredData[index]
-                                      : state.productData[index];
-
-                                  return Padding(
-                                    padding: const EdgeInsets.only(bottom: 16.0),
-                                    child: _singleProductCard(context, product, size),
-                                  );
-                                },
+                            if (!state.hasMoreProducts &&
+                                index == state.productData.length) {
+                              return Center(
+                                child: Padding(
+                                  padding: const EdgeInsets.all(16.0),
+                                  child: Text(
+                                    "No more products",
+                                    style: TextStyle(
+                                        fontSize: 16, color: Colors.grey),
+                                  ),
+                                ),
                               );
-                      }
+                            }
 
-                      return const Center(child: Text('No products available'));
-                    },
-                  ),
-                ),
-              ],
+                            final product = state.filteredData.isNotEmpty
+                                ? state.filteredData[index]
+                                : state.productData[index];
+
+                            return Padding(
+                              padding: const EdgeInsets.only(bottom: 16.0),
+                              child: _singleProductCard(context, product, size),
+                            );
+                          },
+                        );
+                }
+
+                return const Center(child: Text('No products available'));
+              },
             ),
           ),
         ),
@@ -185,6 +173,17 @@ class _HomeScreenState extends State<HomeScreen> {
         }
       },
     );
+  }
+
+//   Widget logout
+  Widget _logout(){
+    return  IconButton(
+        onPressed: () {
+          context.read<LoginBloc>().add(LogoutUser());
+          Navigator.pushNamedAndRemoveUntil(
+              context, RoutesName.login, (route) => false);
+        },
+        icon: Icon(Icons.logout_outlined));
   }
 
 // Single Product Card
